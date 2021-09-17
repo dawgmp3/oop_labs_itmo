@@ -1,3 +1,4 @@
+using Isu.Classes;
 using Isu.Services;
 using Isu.Tools;
 using NUnit.Framework;
@@ -11,14 +12,15 @@ namespace Isu.Tests
         [SetUp]
         public void Setup()
         {
-            //TODO: implement
-            _isuService = null;
+            _isuService = new IsuServices();
         }
 
         [Test]
         public void AddStudentToGroup_StudentHasGroupAndGroupContainsStudent()
         {
-            Assert.Fail();
+            Group newgroup = _isuService.AddGroup("M3209");
+            Student newstudent = _isuService.AddStudent(newgroup,"Misha");
+            Assert.Contains(newstudent, newgroup.Students);
         }
 
         [Test]
@@ -26,7 +28,11 @@ namespace Isu.Tests
         {
             Assert.Catch<IsuException>(() =>
             {
-                
+                Group newgroup = _isuService.AddGroup("M3210");
+                for (var i = 0; i < 31; ++i)
+                {
+                    _isuService.AddStudent(newgroup, "Misha");
+                }
             });
         }
 
@@ -35,17 +41,19 @@ namespace Isu.Tests
         {
             Assert.Catch<IsuException>(() =>
             {
-
+                Group newgroup = _isuService.AddGroup("P3109");
+                Group newgroup_ = _isuService.AddGroup("M4109");
             });
         }
 
         [Test]
         public void TransferStudentToAnotherGroup_GroupChanged()
         {
-            Assert.Catch<IsuException>(() =>
-            {
-
-            });
+            Group newgroup1 = _isuService.AddGroup("M3105");
+            Group newgroup2 = _isuService.AddGroup("M3106");
+            Student student = _isuService.AddStudent(newgroup1, "Misha");
+            _isuService.ChangeStudentGroup(student, newgroup2);
+            Assert.Contains(student, newgroup2.Students);
         }
     }
 }
