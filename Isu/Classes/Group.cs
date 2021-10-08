@@ -4,15 +4,21 @@ namespace Isu.Classes
 {
     public class Group
     {
-        public Group(string name)
+        private int _studentCount = 0;
+        public Group(GroupName name)
         {
-            NName = name;
-            Name = new GroupName(name);
-            Students = new List<Student>();
+            Name = name;
         }
 
-        public string NName { get; }
-        public List<Student> Students { get; }
         public GroupName Name { get; }
+        public void CountOfStudents()
+        {
+            ++_studentCount;
+        }
+
+        public int GetCountOfStudents()
+        {
+            return _studentCount;
+        }
     }
 }

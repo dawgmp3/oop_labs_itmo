@@ -8,11 +8,13 @@ namespace Isu.Tests
     public class Tests
     {
         private IIsuService _isuService;
-
+        private int _maxStudentt;
+        
         [SetUp]
         public void Setup()
         {
-            _isuService = new IsuServices();
+            _maxStudentt = 30;
+            _isuService = new IsuServices(_maxStudentt);
         }
 
         [Test]
@@ -20,7 +22,7 @@ namespace Isu.Tests
         {
             Group newgroup = _isuService.AddGroup("M3209");
             Student newstudent = _isuService.AddStudent(newgroup,"Misha");
-            Assert.Contains(newstudent, newgroup.Students);
+            Assert.AreEqual(newstudent.Group, newgroup);
         }
 
         [Test]
@@ -51,9 +53,9 @@ namespace Isu.Tests
         {
             Group newgroup1 = _isuService.AddGroup("M3105");
             Group newgroup2 = _isuService.AddGroup("M3106");
-            Student student = _isuService.AddStudent(newgroup1, "Misha");
-            _isuService.ChangeStudentGroup(student, newgroup2);
-            Assert.Contains(student, newgroup2.Students);
+            Student stud1 = _isuService.AddStudent(newgroup1, "Misha");
+            _isuService.ChangeStudentGroup(stud1, newgroup2);
+            Assert.AreEqual(stud1.Group.Name.GrName, newgroup2.Name.GrName);
         }
     }
 }
