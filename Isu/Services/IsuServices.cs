@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using Isu.Classes;
 using Isu.Tools;
 
@@ -52,9 +49,9 @@ namespace Isu.Services
 
         public Student GetStudent(int id)
         {
-            foreach (var studentId in _allstudents)
+            foreach (Student studentId in _allstudents)
             {
-                if (studentId.Id == id)
+                if (studentId.Id1 == id)
                 {
                     return studentId;
                 }
