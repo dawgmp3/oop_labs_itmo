@@ -16,6 +16,11 @@ namespace Isu.Classes
             ++_studentCount;
         }
 
+        public void MinusCount()
+        {
+            --_studentCount;
+        }
+
         public int GetCountOfStudents()
         {
             return _studentCount;

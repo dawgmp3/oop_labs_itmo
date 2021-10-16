@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Isu.Classes;
 using Isu.Tools;
 
@@ -16,22 +17,38 @@ namespace Isu.Services
             _maxCountOfStudent = max;
         }
 
-        public Group AddGroup(string name)
+        public bool NameOfGroup(string name)
         {
-            bool permission = false;
+            var groupname = new GroupName(name);
+            bool rightname = false;
             foreach (var namee in _groupnames)
             {
                 if (name.Substring(0, 2) == namee)
                 {
-                    permission = true;
+                    rightname = true;
                 }
             }
 
-            if (permission == false)
+            if (rightname == false)
             {
-                throw new IsuException("Wrong name.");
+                return false;
             }
 
+            if (groupname.CourseNumber >= (CourseNumber)1 && groupname.CourseNumber <= (CourseNumber)4)
+            {
+                if (groupname.GroupNumber >= 0 && groupname.GroupNumber <= 11)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Group AddGroup(string name)
+        {
+            bool namegroup = NameOfGroup(name);
+            if (!namegroup) throw new IsuException("Wrong name.");
             var group = new Group(new GroupName(name));
             _groups.Add(group);
             return group;
@@ -41,20 +58,17 @@ namespace Isu.Services
         {
             if (_maxCountOfStudent <= group.GetCountOfStudents())
                 throw new IsuException("There is no more place.");
-            var stud = new Student(name, group);
-            _allstudents.Add(stud);
+            var student = new Student(name, group);
+            _allstudents.Add(student);
             group.CountOfStudents();
-            return stud;
+            return student;
         }
 
         public Student GetStudent(int id)
         {
-            foreach (Student studentId in _allstudents)
+            foreach (var student in _allstudents.Where(student => student.Id1 == id))
             {
-                if (studentId.Id1 == id)
-                {
-                    return studentId;
-                }
+                return student;
             }
 
             throw new IsuException("Student with this id doesn't exist");
@@ -62,27 +76,12 @@ namespace Isu.Services
 
         public Student FindStudent(string name)
         {
-            foreach (var student in _allstudents)
-            {
-                if (student.Name == name)
-                {
-                    return student;
-                }
-            }
-
-            return null;
+            return _allstudents.FirstOrDefault(student => student.Name == name);
         }
 
         public List<Student> FindStudents(string groupName)
         {
-            var students = new List<Student>();
-            foreach (Student student in _allstudents)
-            {
-                if (student.Group.Name.ToString() == groupName)
-                {
-                    students.Add(student);
-                }
-            }
+            var students = _allstudents.Where(student => student.Group.Name.ToString() == groupName).ToList();
 
             return null;
         }
@@ -105,34 +104,19 @@ namespace Isu.Services
 
         public Group FindGroup(string groupName)
         {
-            foreach (var group in _groups)
-            {
-                if (group.Name.ToString() == groupName)
-                {
-                    return group;
-                }
-            }
-
-            return null;
+            return _groups.FirstOrDefault(@group => @group.Name.ToString() == groupName);
         }
 
         public List<Group> FindGroups(CourseNumber courseNumber)
         {
-            var groupsCourse = new List<Group>();
-            foreach (var group in _groups)
-            {
-                if (group.Name.CourseNumber == courseNumber)
-                {
-                    groupsCourse.Add(group);
-                }
-            }
-
-            return groupsCourse;
+            return _groups.Where(@group => @group.Name.CourseNumber == courseNumber).ToList();
         }
 
         public void ChangeStudentGroup(Student student, Group newGroup)
         {
+            student.Group.MinusCount();
             student.Group = newGroup;
+            student.Group.CountOfStudents();
         }
     }
 }

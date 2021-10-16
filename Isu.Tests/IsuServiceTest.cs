@@ -8,13 +8,13 @@ namespace Isu.Tests
     public class Tests
     {
         private IIsuService _isuService;
-        private int _maxStudentt;
+        private int _maxAmountInGroup;
         
         [SetUp]
         public void Setup()
         {
-            _maxStudentt = 30;
-            _isuService = new IsuServices(_maxStudentt);
+            _maxAmountInGroup = 30;
+            _isuService = new IsuServices(_maxAmountInGroup);
         }
 
         [Test]
@@ -28,23 +28,24 @@ namespace Isu.Tests
         [Test]
         public void ReachMaxStudentPerGroup_ThrowException()
         {
+            Group newgroup = _isuService.AddGroup("M3210");
             Assert.Catch<IsuException>(() =>
             {
-                Group newgroup = _isuService.AddGroup("M3210");
                 for (var i = 0; i < 31; ++i)
                 {
                     _isuService.AddStudent(newgroup, "Misha");
                 }
+                
             });
         }
 
-        [Test]
-        public void CreateGroupWithInvalidName_ThrowException()
+        [TestCase("P3209")]
+        [TestCase("M3509")]    
+        public void CreateGroupWithInvalidName_ThrowException(string name)
         {
             Assert.Catch<IsuException>(() =>
             {
-                Group newgroup = _isuService.AddGroup("P3109");
-                Group newgroup_ = _isuService.AddGroup("M4109");
+                Group newgroup = _isuService.AddGroup(name);
             });
         }
 

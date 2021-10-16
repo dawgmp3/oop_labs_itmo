@@ -14,11 +14,5 @@ namespace Isu.Classes
         public CourseNumber CourseNumber { get; }
         public int GroupNumber { get; }
         public string GrName { get; }
-        public override string ToString()
-        {
-            if (string.IsNullOrEmpty(GrName))
-                return base.ToString();
-            return GrName;
-        }
     }
 }
