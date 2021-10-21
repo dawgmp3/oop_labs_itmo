@@ -22,7 +22,7 @@ namespace Isu.Tests
         {
             Group newgroup = _isuService.AddGroup("M3209");
             Student newstudent = _isuService.AddStudent(newgroup,"Misha");
-            Assert.AreEqual(newstudent.Group, newgroup);
+            Assert.AreEqual(newstudent.GetStudentGroup(), newgroup);
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace Isu.Tests
             Group newgroup = _isuService.AddGroup("M3210");
             Assert.Catch<IsuException>(() =>
             {
-                for (var i = 0; i < 31; ++i)
+                for (var i = 0; i <= 31; i++)
                 {
                     _isuService.AddStudent(newgroup, "Misha");
                 }
@@ -54,9 +54,9 @@ namespace Isu.Tests
         {
             Group newgroup1 = _isuService.AddGroup("M3105");
             Group newgroup2 = _isuService.AddGroup("M3106");
-            Student stud1 = _isuService.AddStudent(newgroup1, "Misha");
-            _isuService.ChangeStudentGroup(stud1, newgroup2);
-            Assert.AreEqual(stud1.Group.Name.GrName, newgroup2.Name.GrName);
+            Student stud = _isuService.AddStudent(newgroup1, "Misha");
+            _isuService.ChangeStudentGroup(stud, newgroup2);
+            Assert.AreEqual(stud.GetStudentGroup().GetName().GrName, newgroup2.GetName().GrName);
         }
     }
 }

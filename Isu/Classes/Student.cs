@@ -5,28 +5,35 @@ namespace Isu.Classes
 {
     public class Student
     {
-        public Student(string name, Group group)
+        private string nameofstudent;
+        private Group groupofstudent;
+        private Guid idofstudent;
+
+        public Student(StudentBuilder student)
         {
-        Name = name;
-        Group = group;
-        Id1 = Guid2Int();
+            nameofstudent = student.GetName();
+            groupofstudent = student.GetGroup();
+            idofstudent = student.Id();
         }
 
-        public int Id1 { get; }
-
-        public Group Group { get; set; }
-        public string Name { get; }
-        public static Guid Id()
+        public void SetGroup(Group group)
         {
-            Guid id = Guid.NewGuid();
-            return id;
+            groupofstudent = group;
         }
 
-        public int Guid2Int()
+        public Group GetStudentGroup()
         {
-            byte[] b = Id().ToByteArray();
-            int bint = BitConverter.ToInt32(b, 0);
-            return bint;
+            return groupofstudent;
+        }
+
+        public string GetStudentName()
+        {
+            return nameofstudent;
+        }
+
+        public Guid GetStudentId()
+        {
+            return idofstudent;
         }
     }
 }

@@ -4,26 +4,42 @@ namespace Isu.Classes
 {
     public class Group
     {
-        private int _studentCount = 0;
-        public Group(GroupName name)
+        private GroupName nameofgroup;
+        private int countofstudents;
+        public Group(GroupName name, int amount)
         {
-            Name = name;
+            nameofgroup = name;
+            countofstudents = amount;
         }
 
-        public GroupName Name { get; }
-        public void CountOfStudents()
+        /*public GroupBuilder ToBuild()
         {
-            ++_studentCount;
+            GroupBuilder groupbuilder = new GroupBuilder();
+            groupbuilder.NameOfGroup(nameofgroup);
+            groupbuilder.GetAmount();
+            return groupbuilder;
+        }*/
+
+        public int PlusStudent()
+        {
+            countofstudents += 1;
+            return countofstudents;
         }
 
-        public void MinusCount()
+        public int MinusStudent()
         {
-            --_studentCount;
+            countofstudents -= 1;
+            return countofstudents;
         }
 
-        public int GetCountOfStudents()
+        public int GetAmount()
         {
-            return _studentCount;
+            return countofstudents;
+        }
+
+        public GroupName GetName()
+        {
+            return nameofgroup;
         }
     }
 }
