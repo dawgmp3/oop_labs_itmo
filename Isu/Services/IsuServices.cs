@@ -55,7 +55,7 @@ namespace Isu.Services
             return group;
         }
 
-        public Student AddStudent(Group group, string name)
+        /*public Student AddStudent(Group group, string name)
         {
             if (_maxCountOfStudent < group.GetAmount())
                 throw new IsuException("There is no more place.");
@@ -67,9 +67,21 @@ namespace Isu.Services
             _allstudents.Add(student);
             group.PlusStudent();
             return student;
+        }*/
+        public Student AddStudent(string name, Group group, int id)
+        {
+            if (_maxCountOfStudent < group.GetAmount())
+                throw new IsuException("There is no more place.");
+            Student newStudent = new Student(name, group, id);
+            Student.StudentBuilder builder = new Student.StudentBuilder();
+            Student.StudentBuilder build = Student.ToBuild(builder);
+            Student student = build.Build();
+            newStudent = student;
+            _allstudents.Add(newStudent);
+            return newStudent;
         }
 
-        public Student GetStudent(Guid id)
+        public Student GetStudent(int id)
         {
             foreach (var student in _allstudents.Where(student => student.GetStudentId() == id))
             {
@@ -119,12 +131,13 @@ namespace Isu.Services
 
         public Student ChangeStudentGroup(Student student, Group newGroup)
         {
-            Group oldgroup = student.GetStudentGroup();
-            oldgroup.MinusStudent();
-            student.SetGroup(newGroup);
-            Group newgroup = student.GetStudentGroup();
-            newgroup.PlusStudent();
-            return student;
+            var builder = new Student.StudentBuilder();
+            Student.StudentBuilder q = Student.ToBuild(builder);
+            q.WithName(student.GetStudentName());
+            q.WithGroup(newGroup);
+            q.WithId(student.GetStudentId());
+            Student changedStudent = q.Build();
+            return changedStudent;
         }
 
         private static Guid Id()

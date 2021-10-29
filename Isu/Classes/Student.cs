@@ -5,35 +5,68 @@ namespace Isu.Classes
 {
     public class Student
     {
-        private string nameofstudent;
-        private Group groupofstudent;
-        private Guid idofstudent;
-
-        public Student(StudentBuilder student)
+        private static string _name;
+        private static Group _group;
+        private static int _id;
+        public Student(string name, Group group, int id)
         {
-            nameofstudent = student.GetName();
-            groupofstudent = student.GetGroup();
-            idofstudent = student.Id();
+            _name = name;
+            _group = group;
+            _id = id;
         }
 
-        public void SetGroup(Group group)
+        public static StudentBuilder ToBuild(StudentBuilder student)
         {
-            groupofstudent = group;
+            student.WithName(_name);
+            student.WithGroup(_group);
+            student.WithId(_id);
+            return student;
         }
 
         public Group GetStudentGroup()
         {
-            return groupofstudent;
+            return _group;
         }
 
         public string GetStudentName()
         {
-            return nameofstudent;
+            return _name;
         }
 
-        public Guid GetStudentId()
+        public int GetStudentId()
         {
-            return idofstudent;
+            return _id;
+        }
+
+        public class StudentBuilder
+        {
+            private string _name;
+            private Group _group;
+            private int _id;
+
+            public StudentBuilder WithName(string name)
+            {
+                _name = name;
+                return this;
+            }
+
+            public StudentBuilder WithGroup(Group group)
+            {
+                _group = group;
+                return this;
+            }
+
+            public StudentBuilder WithId(int id)
+            {
+                _id = id;
+                return this;
+            }
+
+            public Student Build()
+            {
+                var student = new Student(_name, _group, _id);
+                return student;
+            }
         }
     }
 }

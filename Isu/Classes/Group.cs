@@ -12,14 +12,6 @@ namespace Isu.Classes
             countofstudents = amount;
         }
 
-        /*public GroupBuilder ToBuild()
-        {
-            GroupBuilder groupbuilder = new GroupBuilder();
-            groupbuilder.NameOfGroup(nameofgroup);
-            groupbuilder.GetAmount();
-            return groupbuilder;
-        }*/
-
         public int PlusStudent()
         {
             countofstudents += 1;
