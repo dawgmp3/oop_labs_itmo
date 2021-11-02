@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Shops.Classes;
 using Shops.Tools;
 
@@ -8,7 +9,7 @@ namespace Shops.Services
     public class ShopManager : IShopManager
     {
         private List<Shop> _shops = new List<Shop>();
-        private List<Products> _storage = new List<Products>();
+        private List<Product> _storage = new List<Product>();
 
         public Shop AddShop(string name, string adress)
         {
@@ -17,30 +18,27 @@ namespace Shops.Services
             return shop;
         }
 
-        public Products ProductsRegistration(string product, int amount)
+        public Product ProductsRegistration(string product, int amount)
         {
-            foreach (Products storageprod in _storage)
+            foreach (var storageprod in _storage.Where(storageprod => product == storageprod.Name))
             {
-                if (product == storageprod.Name)
-                {
-                    storageprod.Amount += amount;
-                    return storageprod;
-                }
+                storageprod.Amount += amount;
+                return storageprod;
             }
 
-            var prdct = new Products(product);
+            var prdct = new Product(product);
             prdct.Amount = amount;
             _storage.Add(prdct);
             return prdct;
         }
 
-        public Products AddProducts(Products product, Shop shop, int price, int amount)
+        public Product AddProduct(Product product, Shop shop, int price, int amount)
         {
-            foreach (Products productInStorage in _storage)
+            foreach (Product productInStorage in _storage)
             {
                 if (product.Name == productInStorage.Name && amount <= productInStorage.Amount)
                 {
-                    foreach (Products prod in shop.Products_)
+                    foreach (Product prod in shop.Products_)
                     {
                         if (product.Name == prod.Name)
                         {
@@ -55,16 +53,16 @@ namespace Shops.Services
                 }
             }
 
-            Products newProd = new Products(product.Name);
+            Product newProd = new Product(product.Name);
             newProd.Amount = amount;
             newProd.Price = price;
             shop.Products_.Add(newProd);
             return newProd;
         }
 
-        public void RePrice(Products product, int price, Shop shop)
+        public void RePrice(Product product, int price, Shop shop)
         {
-            foreach (Products productInShop in shop.Products_)
+            foreach (Product productInShop in shop.Products_)
             {
                 if (product.Id1 == productInShop.Id1)
                 {
@@ -73,17 +71,21 @@ namespace Shops.Services
             }
         }
 
-        public Shop Purchase(Customer customer, Shop shop, string product, int amount)
+        public Shop Purchase(Customer customer, Shop shop, int amount, List<Product> products)
         {
-            foreach (Products productInShop in shop.Products_)
+            List<Product> bucketOfBroducts = products;
+            foreach (Product productInShop in shop.Products_)
             {
-                if (product == productInShop.Name)
+                foreach (var productInBucket in bucketOfBroducts)
                 {
-                    if (amount <= productInShop.Amount && customer.Wallet >= productInShop.Price * amount)
+                    if (productInBucket.Name == productInShop.Name)
                     {
-                        productInShop.Amount -= amount;
-                        customer.Wallet -= productInShop.Price * amount;
-                        return shop;
+                        if (amount <= productInShop.Amount && customer.Wallet >= productInShop.Price * amount)
+                        {
+                            productInShop.Amount -= amount;
+                            customer.Wallet -= productInShop.Price * amount;
+                            return shop;
+                        }
                     }
                 }
             }
@@ -91,23 +93,23 @@ namespace Shops.Services
             throw new ShopException("There is no such a product in shop");
         }
 
-        public int FindMinimumPrice(string productName, int amount)
+        public Shop FindMinimumPriceShop(Product product, int amount)
         {
             int min = int.MaxValue;
-            int shop = 0;
-            foreach (var shopP in _shops)
+            Shop shop = null;
+            foreach (var shop_ in _shops)
             {
-                foreach (Products prodInShop in shopP.Products_)
+                foreach (Product prodInShop in shop_.Products_)
                 {
-                    if (prodInShop.Price < min && prodInShop.Amount <= amount && productName == prodInShop.Name)
+                    if (prodInShop.Price < min && prodInShop.Amount <= amount && product.Id1 == prodInShop.Id1)
                     {
                         min = prodInShop.Price;
-                        shop = shopP.Id_;
+                        shop = shop_;
                     }
                 }
             }
 
-            if (min != int.MaxValue && shop != 0)
+            if (min != int.MaxValue && shop != null)
             {
                 return shop;
             }
@@ -115,14 +117,19 @@ namespace Shops.Services
             throw new ShopException("Error");
         }
 
-        public Shop Delivery(Customer customer, int amount, string prodname)
+        public Shop Delivery(Customer customer, int amount, List<Product> products)
         {
-            int shop = FindMinimumPrice(prodname, amount);
+            Shop shop = null;
+            foreach (var productInBucket in products)
+            {
+                shop = FindMinimumPriceShop(productInBucket, amount);
+            }
+
             foreach (Shop shops in _shops)
             {
-                if (shops.Id_ == shop)
+                if (shops.Name == shop.Name)
                 {
-                    Purchase(customer, shops, prodname, amount);
+                    Purchase(customer, shops, amount, products);
                     return shops;
                 }
             }

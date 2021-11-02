@@ -6,14 +6,14 @@ namespace Shops.Classes
     public class Shop
     {
         public Shop(string name, string adress)
-            {
-                Name = name;
-                Adress = adress;
-                Id_ = Guid2Int();
-                Products_ = new List<Products>();
-            }
+        {
+            Name = name;
+            Adress = adress;
+            Id_ = Guid2Int();
+            Products_ = new List<Product>();
+        }
 
-        public List<Products> Products_ { get; }
+        public List<Product> Products_ { get; }
         public string Name { get; }
         public string Adress { get; }
         public int Id_ { get; }

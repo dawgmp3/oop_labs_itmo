@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Shops.Classes;
 using Shops.Services;
@@ -19,12 +20,12 @@ namespace Shops.Tests
         [Test]
         public void AddProduct_ThrowException()
         {
+            Shop shop = _shopService1.AddShop("Tokko", "Kirova");
+            Product prodRegistr = _shopService1.ProductsRegistration("Milk", 100); 
+            Product product = new Product("Milk");
             Assert.Catch<ShopException>(() =>
             {
-                Shop shop = _shopService1.AddShop("Tokko", "Kirova");
-                Products prodRegistr = _shopService1.ProductsRegistration("Milk", 100); 
-                Products product = new Products("Milk");
-                _shopService1.AddProducts(product, shop, 100, 101);
+                _shopService1.AddProduct(product, shop, 100, 101);
             });
         }
         
@@ -32,8 +33,8 @@ namespace Shops.Tests
         public void Price_RePrice_ThrowException()
         {
             Shop shop = _shopService1.AddShop("Tokko", "Kirova");
-            Products prodRegistr = _shopService1.ProductsRegistration("Milk", 10000);
-            Products prod = _shopService1.AddProducts(prodRegistr, shop, 100, 100);
+            Product prodRegistr = _shopService1.ProductsRegistration("Milk", 10000);
+            Product prod = _shopService1.AddProduct(prodRegistr, shop, 100, 100);
             _shopService1.RePrice(prod, 101, shop);
             Assert.AreEqual(101, prod.Price);
         }
@@ -41,14 +42,14 @@ namespace Shops.Tests
         [Test]
         public void MinPrice_ThrowException()
         {
+            Shop shop1 = _shopService1.AddShop("Tokko", "Kirova");
+            Shop shop2 = _shopService1.AddShop("Almaz", "Yaroslavskogo");
+            Product prodRegistr = _shopService1.ProductsRegistration("Butter", 10000);
+            Product product1 = _shopService1.AddProduct(prodRegistr, shop1, 100, 10);
+            Product product2 = _shopService1.AddProduct(prodRegistr, shop2, 99, 10);
             Assert.Catch<ShopException>(() =>
             {
-                Shop shop1 = _shopService1.AddShop("Tokko", "Kirova");
-                Shop shop2 = _shopService1.AddShop("Almaz", "Yaroslavskogo");
-                Products prodRegistr = _shopService1.ProductsRegistration("Butter", 10000);
-                Products product1 = _shopService1.AddProducts(prodRegistr, shop1, 100, 10);
-                Products product2 = _shopService1.AddProducts(prodRegistr, shop2, 99, 10);
-                _shopService1.FindMinimumPrice("avocado", 11);
+                _shopService1.FindMinimumPriceShop(prodRegistr, 11);
             });
         }
         
@@ -58,10 +59,13 @@ namespace Shops.Tests
             Assert.Catch<ShopException>(() =>
             {
                 Shop shop = _shopService1.AddShop("Tokko", "Kirova");
-                Products prodRegistr = _shopService1.ProductsRegistration("Milk", 10000);
+                Product prodRegistr = _shopService1.ProductsRegistration("Milk", 10000);
+                Product prodRegistr1 = _shopService1.ProductsRegistration("Milkq", 10000);
+                List<Product> prod = new List<Product>();
+                prod.Add(prodRegistr1);
                 Customer customer = new Customer("Misha", 10000000);
-                Products prod1 = _shopService1.AddProducts(prodRegistr, shop, 100, 100);
-                _shopService1.Purchase(customer, shop, "cat", 10);
+                Product prod1 = _shopService1.AddProduct(prodRegistr, shop, 100, 100);
+                _shopService1.Purchase(customer, shop, 10, prod);
             });
         }
     }
