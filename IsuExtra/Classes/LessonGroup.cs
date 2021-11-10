@@ -5,18 +5,16 @@ namespace IsuExtra.Classes
     public class LessonGroup
     {
         private string _teacher;
-        private string _day;
+        private int _day;
         private GroupISU _group;
-        private int _hour;
-        private int _minutes;
+        private int _time;
         private int _auditory;
-        public LessonGroup(GroupISU group, string teacher, string day, int hour, int minutes, int auditory)
+        public LessonGroup(GroupISU group, string teacher, int day, int time, int auditory)
         {
             _teacher = teacher;
             _day = day;
             _group = group;
-            _hour = hour;
-            _minutes = minutes;
+            _time = time;
             _auditory = auditory;
         }
 
@@ -25,7 +23,7 @@ namespace IsuExtra.Classes
             return _teacher;
         }
 
-        public string GetDay()
+        public int GetDay()
         {
             return _day;
         }
@@ -35,14 +33,9 @@ namespace IsuExtra.Classes
             return _group;
         }
 
-        public int GetHour()
+        public int GetTime()
         {
-            return _hour;
-        }
-
-        public int GetMinutes()
-        {
-            return _minutes;
+            return _time;
         }
 
         public int GetAuditory()

@@ -55,24 +55,25 @@ namespace Isu.Services
             return group;
         }
 
-        /*public Student AddStudent(Group group, string name)
+        public Student AddStudent(Group group, string name)
         {
             if (_maxCountOfStudent < group.GetAmount())
                 throw new IsuException("There is no more place.");
-            StudentBuilder studentbuild = new StudentBuilder();
-            studentbuild.NameStudent(name);
-            studentbuild.GroupStudent(group);
-            studentbuild.IdStudent(Id());
+            Student.StudentBuilder studentbuild = new Student.StudentBuilder();
+            studentbuild.WithName(name);
+            studentbuild.WithGroup(group);
+            studentbuild.WithId(Id());
             Student student = studentbuild.Build();
             _allstudents.Add(student);
             group.PlusStudent();
             return student;
-        }*/
-        public Student AddStudent(string name, Group group, int id)
+        }
+
+        public Student AddStudent(string name, Group group)
         {
-            if (_maxCountOfStudent < group.GetAmount())
+            if (_maxCountOfStudent == group.GetAmount())
                 throw new IsuException("There is no more place.");
-            Student newStudent = new Student(name, group, id);
+            Student newStudent = new Student(name, group, Id());
             Student.StudentBuilder builder = new Student.StudentBuilder();
             Student.StudentBuilder build = Student.ToBuild(builder);
             Student student = build.Build();
@@ -81,7 +82,7 @@ namespace Isu.Services
             return newStudent;
         }
 
-        public Student GetStudent(int id)
+        public Student GetStudent(Guid id)
         {
             foreach (var student in _allstudents.Where(student => student.GetStudentId() == id))
             {

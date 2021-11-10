@@ -7,9 +7,9 @@ namespace Isu.Services
     public interface IIsuService
     {
         Group AddGroup(string name);
-        Student AddStudent(string name, Group group, int id);
+        Student AddStudent(string name, Group group);
 
-        Student GetStudent(int id);
+        Student GetStudent(Guid id);
         Student FindStudent(string name);
         List<Student> FindStudents(string groupName);
         List<Student> FindStudents(CourseNumber courseNumber);

@@ -7,8 +7,8 @@ namespace Isu.Classes
     {
         private static string _name;
         private static Group _group;
-        private static int _id;
-        public Student(string name, Group group, int id)
+        private static Guid _id;
+        public Student(string name, Group group, Guid id)
         {
             _name = name;
             _group = group;
@@ -33,7 +33,7 @@ namespace Isu.Classes
             return _name;
         }
 
-        public int GetStudentId()
+        public Guid GetStudentId()
         {
             return _id;
         }
@@ -42,7 +42,7 @@ namespace Isu.Classes
         {
             private string _name;
             private Group _group;
-            private int _id;
+            private Guid _id;
 
             public StudentBuilder WithName(string name)
             {
@@ -56,7 +56,7 @@ namespace Isu.Classes
                 return this;
             }
 
-            public StudentBuilder WithId(int id)
+            public StudentBuilder WithId(Guid id)
             {
                 _id = id;
                 return this;

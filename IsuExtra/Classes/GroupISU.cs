@@ -5,21 +5,26 @@ namespace IsuExtra.Classes
 {
     public class GroupISU : Group
     {
-        private string _faculty;
-        public GroupISU(GroupName name, int amount, string faculty)
+        private ScheduleISU _schedule;
+        public GroupISU(GroupName name, int amount)
             : base(name, amount)
         {
-            Lessons = new List<LessonGroup>();
-            Students = new List<Student>();
-            _faculty = faculty;
+            Students = new List<ExtraStudent>();
+            Faculty = name.GrName.Substring(0, 1);
+            _schedule = new ScheduleISU();
         }
 
-        public List<Student> Students { get; }
+        public string Faculty { get; }
+        public List<ExtraStudent> Students { get; }
 
-        public List<LessonGroup> Lessons { get; }
-        public string GetFaculty()
+        public ScheduleISU GetSchedule()
         {
-            return _faculty;
+            return _schedule;
+        }
+
+        public void SetSchedule(ScheduleISU schedule)
+        {
+            _schedule = schedule;
         }
     }
 }

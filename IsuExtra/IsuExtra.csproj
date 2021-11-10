@@ -27,4 +27,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Classes\Student1.cs" />
+  </ItemGroup>
+
 </Project>
