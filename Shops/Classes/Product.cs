@@ -9,14 +9,14 @@ namespace Shops.Classes
         public Product(string name)
         {
             Name = name;
-            Id1 = Id();
+            Id = GenerateId();
         }
 
         public string Name { get; }
         public int Price { get; set; }
         public int Amount { get; set; }
-        public Guid Id1 { get; }
-        private static Guid Id()
+        public Guid Id { get; }
+        private static Guid GenerateId()
         {
             Guid id = Guid.NewGuid();
             return id;

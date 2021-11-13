@@ -8,8 +8,8 @@ namespace Shops.Services
 {
     public class ShopManager : IShopManager
     {
-        private List<Shop> _shops = new List<Shop>();
-        private List<Product> _storage = new List<Product>();
+        private readonly List<Shop> _shops = new List<Shop>();
+        private readonly List<Product> _storage = new List<Product>();
 
         public Shop AddShop(string name, string adress)
         {
@@ -20,10 +20,10 @@ namespace Shops.Services
 
         public Product ProductsRegistration(string product, int amount)
         {
-            foreach (var storageprod in _storage.Where(storageprod => product == storageprod.Name))
+            foreach (Product storageProd in _storage.Where(storageProd => product == storageProd.Name))
             {
-                storageprod.Amount += amount;
-                return storageprod;
+                storageProd.Amount += amount;
+                return storageProd;
             }
 
             var prdct = new Product(product);
@@ -36,105 +36,99 @@ namespace Shops.Services
         {
             foreach (Product productInStorage in _storage)
             {
-                if (product.Name == productInStorage.Name && amount <= productInStorage.Amount)
+                if (product.Name == productInStorage.Name && productInStorage.Amount >= amount)
                 {
-                    foreach (Product prod in shop.Products_)
+                    Product prod = shop.FindProduct(product, amount);
+                    if (prod != null)
                     {
-                        if (product.Name == prod.Name)
-                        {
-                            prod.Amount += amount;
-                            return prod;
-                        }
+                        prod.Amount += amount;
+                        return prod;
                     }
                 }
-                else
-                {
-                    throw new ShopException("No product");
-                }
             }
 
-            Product newProd = new Product(product.Name);
-            newProd.Amount = amount;
-            newProd.Price = price;
-            shop.Products_.Add(newProd);
-            return newProd;
-        }
-
-        public void RePrice(Product product, int price, Shop shop)
-        {
-            foreach (Product productInShop in shop.Products_)
+            foreach (Product productInStorage in _storage)
             {
-                if (product.Id1 == productInShop.Id1)
+                if (product.Name == productInStorage.Name && productInStorage.Amount >= amount)
                 {
-                    productInShop.Price = price;
+                    var newProd = new Product(product.Name);
+                    newProd.Amount = amount;
+                    newProd.Price = price;
+                    shop.AddProduct(newProd);
+                    return newProd;
                 }
             }
+
+            throw new ShopException("No product in storage");
         }
 
         public Shop Purchase(Customer customer, Shop shop, int amount, List<Product> products)
         {
-            List<Product> bucketOfBroducts = products;
-            foreach (Product productInShop in shop.Products_)
+            int price = CountPrice(shop, products, amount);
+            foreach (Product prod in products)
             {
-                foreach (var productInBucket in bucketOfBroducts)
+                Product findedProd = shop.FindProduct(prod, amount);
+                if (findedProd == null)
                 {
-                    if (productInBucket.Name == productInShop.Name)
-                    {
-                        if (amount <= productInShop.Amount && customer.Wallet >= productInShop.Price * amount)
-                        {
-                            productInShop.Amount -= amount;
-                            customer.Wallet -= productInShop.Price * amount;
-                            return shop;
-                        }
-                    }
+                    throw new ShopException("No product in the shop");
                 }
+
+                if (customer.Wallet >= price)
+                {
+                    customer.Wallet -= price;
+                }
+
+                if (customer.Wallet < price)
+                {
+                    throw new ShopException("No money");
+                }
+
+                Delivery(customer, amount, products);
             }
 
-            throw new ShopException("There is no such a product in shop");
+            return shop;
         }
 
         public Shop FindMinimumPriceShop(Product product, int amount)
         {
             int min = int.MaxValue;
-            Shop shop = null;
-            foreach (var shop_ in _shops)
+            Shop shopWithMinPrice = null;
+            foreach (Shop shop in _shops)
             {
-                foreach (Product prodInShop in shop_.Products_)
+                int price = shop.FindPrice(product, amount);
+                if (price < min)
                 {
-                    if (prodInShop.Price < min && prodInShop.Amount <= amount && product.Id1 == prodInShop.Id1)
-                    {
-                        min = prodInShop.Price;
-                        shop = shop_;
-                    }
+                    min = price;
+                    shopWithMinPrice = shop;
                 }
             }
 
-            if (min != int.MaxValue && shop != null)
+            if (min != int.MaxValue && shopWithMinPrice != null)
             {
-                return shop;
+                return shopWithMinPrice;
             }
 
             throw new ShopException("Error");
         }
 
-        public Shop Delivery(Customer customer, int amount, List<Product> products)
+        public void Delivery(Customer customer, int amount, List<Product> products)
         {
-            Shop shop = null;
             foreach (var productInBucket in products)
             {
-                shop = FindMinimumPriceShop(productInBucket, amount);
+                customer.AddProductToFridge(productInBucket, amount);
             }
+        }
 
-            foreach (Shop shops in _shops)
+        public int CountPrice(Shop shop, List<Product> bucket, int amount)
+        {
+            int finalPriceOfBucket = 0;
+            foreach (Product productInBucket in bucket)
             {
-                if (shops.Name == shop.Name)
-                {
-                    Purchase(customer, shops, amount, products);
-                    return shops;
-                }
+                int price = shop.FindPrice(productInBucket, amount) * amount;
+                finalPriceOfBucket += price;
             }
 
-            throw new ShopException("error");
+            return finalPriceOfBucket;
         }
     }
 }
