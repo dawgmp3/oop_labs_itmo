@@ -69,7 +69,7 @@ namespace Isu.Services
             return student;
         }
 
-        public Student AddStudent(string name, Group group)
+        /*public Student AddStudent(string name, Group group)
         {
             if (_maxCountOfStudent == group.GetAmount())
                 throw new IsuException("There is no more place.");
@@ -80,7 +80,7 @@ namespace Isu.Services
             newStudent = student;
             _allstudents.Add(newStudent);
             return newStudent;
-        }
+        }*/
 
         public Student GetStudent(Guid id)
         {
