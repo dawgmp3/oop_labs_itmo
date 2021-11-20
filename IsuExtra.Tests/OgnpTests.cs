@@ -11,7 +11,7 @@ namespace IsuExtra.Tests
 {
     public class OgnpTests
     {
-        private IOGNP _ognp;
+        private IOgnp _ognp;
         
         [SetUp]
         public void Setup()
@@ -71,10 +71,41 @@ namespace IsuExtra.Tests
             _ognp.AddLessonToFlow("Maria", 1, groupOgnp1, 2, 256);
             _ognp.AddLessonToFlow("Maria", 1, groupOgnp2, 2, 256);
             _ognp.AddLessonToFlow("Maria", 1, groupOgnp3, 2, 256);
-            _ognp.AddGroupsToFlow(flow, groupOgnp1, groupOgnp2, groupOgnp3);
+            _ognp.AddGroupToFlow(flow, groupOgnp1);
+            _ognp.AddGroupToFlow(flow, groupOgnp2);
+            _ognp.AddGroupToFlow(flow, groupOgnp3);
             
             Course course = _ognp.AddCourse("Кибербез", "F", flow);
             ExtraStudent student = new ExtraStudent("Misha", new Guid(), group);
+            Assert.Catch<IsuExtraException>(() =>
+            {
+                _ognp.AddStudentToCourse(student, course);
+            });
+        }
+        [Test]
+        public void AddStudentToCourse_HeHasOgnp()
+        {
+            GroupName name = new GroupName("M3209");
+            GroupISU group = new GroupISU(name, 20);
+            GroupOGNP groupOgnp1 = new GroupOGNP("2", 20);
+            _ognp.AddLessonToGroup(group, "Maria", 1, 3, 111);
+            Flow flow = new Flow("1");
+            
+            _ognp.AddLessonToFlow("Maria", 1, groupOgnp1, 2, 256);
+            _ognp.AddGroupToFlow(flow, groupOgnp1);
+            
+            Course course = _ognp.AddCourse("Кибербез", "F", flow);
+            
+            GroupOGNP groupOgnp1_2 = new GroupOGNP("2", 20);
+            Flow flow2 = new Flow("1");
+            
+            _ognp.AddLessonToFlow("Maria", 1, groupOgnp1_2, 5, 256);
+            _ognp.AddGroupToFlow(flow2, groupOgnp1_2);
+            
+            Course course2 = _ognp.AddCourse("Кибербезз", "L", flow2);
+            
+            ExtraStudent student = new ExtraStudent("Misha", new Guid(), group);
+            _ognp.AddStudentToCourse(student, course2);
             Assert.Catch<IsuExtraException>(() =>
             {
                 _ognp.AddStudentToCourse(student, course);

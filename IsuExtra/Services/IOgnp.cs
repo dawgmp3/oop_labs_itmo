@@ -5,20 +5,20 @@ using IsuExtra.Classes;
 
 namespace Isu.Services
 {
-    public interface IOGNP
+    public interface IOgnp
     {
         Course AddCourse(string name, string faculty, Flow flow);
-        Flow AddGroupsToFlow(Flow flow, GroupOGNP group1, GroupOGNP group2, GroupOGNP group3);
+        Flow AddGroupToFlow(Flow flow, GroupOGNP group);
 
-        LessonOGNP AddLessonToFlow(string teacher, int day, GroupOGNP group, int time, int auditory);
+        Lesson AddLessonToFlow(string teacher, int day, GroupOGNP group, int numberOfLesson, int auditory);
 
-        LessonGroup AddLessonToGroup(GroupISU group, string teacher, int day, int time, int auditory);
-        bool PermissionForSigning(GroupOGNP group, List<LessonGroup> lessons1);
+        Lesson AddLessonToGroup(GroupISU group, string teacher, int day, int numberOfLesson, int auditory);
+        GroupOGNP PermissionForSigning(GroupOGNP group, List<Lesson> lessons1);
         ExtraStudent AddStudentToCourse(ExtraStudent student, Course course);
         Flow GetFlows(Course course);
         List<ExtraStudent> GetStudentsOgnpGroup(GroupOGNP group);
         List<ExtraStudent> GetStudentsFromCourse(Course course, string name);
         List<ExtraStudent> GetNotSignedStudents();
-        Student RemoveStudentFromOgnp(ExtraStudent student, Course course);
+        ExtraStudent RemoveStudentFromOgnp(ExtraStudent student, Course course);
     }
 }

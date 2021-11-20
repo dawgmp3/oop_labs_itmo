@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Isu.Classes;
+using Isu.Tools;
 
 namespace IsuExtra.Classes
 {
@@ -13,5 +14,18 @@ namespace IsuExtra.Classes
         }
 
         public List<GroupOGNP> Groups { get; }
+
+        public GroupOGNP FindGroupForSigning()
+        {
+            foreach (GroupOGNP group in Groups)
+            {
+                if (group.CountOfStudents() < group.GetMaxAmount())
+                {
+                    return group;
+                }
+            }
+
+            throw new IsuExtraException("No place");
+        }
     }
 }

@@ -7,7 +7,7 @@ using IsuExtra.Classes;
 
 namespace IsuExtra.Services
 {
-    public class Ognp : IOGNP
+    public class Ognp : IOgnp
     {
         private List<Course> _allCourses = new List<Course>();
         private List<ExtraStudent> _allStudent = new List<ExtraStudent>();
@@ -28,19 +28,19 @@ namespace IsuExtra.Services
             return newCourse;
         }
 
-        public Flow AddGroupsToFlow(Flow flow, GroupOGNP group1, GroupOGNP group2, GroupOGNP group3)
+        public Flow AddGroupToFlow(Flow flow, GroupOGNP group)
         {
-            flow.Groups.Add(group1);
-            flow.Groups.Add(group2);
-            flow.Groups.Add(group3);
+            flow.Groups.Add(group);
             return flow;
         }
 
-        public LessonOGNP AddLessonToFlow(string teacher, int day, GroupOGNP group, int time, int auditory)
+        public Lesson AddLessonToFlow(string teacher, int day, GroupOGNP group, int numberOfLesson, int auditory)
         {
-            if (time <= 8 && day <= 7)
+            int maxCountOfLessons = 8;
+            int countOfDays = 7;
+            if (numberOfLesson <= maxCountOfLessons && day <= countOfDays)
             {
-                LessonOGNP lesson = new LessonOGNP(teacher, day, group, time, auditory);
+                Lesson lesson = new Lesson(teacher, day, numberOfLesson, auditory);
                 ScheduleOGNP sched = group.GetSchedule();
                 sched.AddLesson(lesson);
                 group.SetSchedule(sched);
@@ -50,37 +50,40 @@ namespace IsuExtra.Services
             throw new IsuExtraException("Error");
         }
 
-        public LessonGroup AddLessonToGroup(GroupISU group, string teacher, int day, int time, int auditory)
+        public Lesson AddLessonToGroup(GroupISU group, string teacher, int day, int time, int auditory)
         {
-            LessonGroup lesson = new LessonGroup(group, teacher, day, time, auditory);
+            Lesson lesson = new Lesson(teacher, day, time, auditory);
             ScheduleISU sched = group.GetSchedule();
             sched.AddLesson(lesson);
             group.SetSchedule(sched);
             return lesson;
         }
 
-        public bool PermissionForSigning(GroupOGNP group, List<LessonGroup> isuLessons)
+        public GroupOGNP PermissionForSigning(GroupOGNP group, List<Lesson> isuLessons)
         {
-            List<LessonOGNP> lessons = group.GetSchedule().GetSchedule();
+            GroupOGNP groupForSigning = null;
+            List<Lesson> lessons = group.GetSchedule().GetSchedule();
             foreach (var lesson in isuLessons)
             {
-                foreach (var groupLesson in group.GetSchedule().GetSchedule())
+                foreach (var groupLesson in lessons)
                 {
-                    if (lesson.GetTime() == groupLesson.GetTime() &&
+                    if (lesson.GetNumberOfLesson() == groupLesson.GetNumberOfLesson() &&
                         lesson.GetDay() == groupLesson.GetDay())
                     {
-                        return false;
+                        return null;
                     }
                 }
             }
 
-            return true;
+            groupForSigning = group;
+            return groupForSigning;
         }
 
         public ExtraStudent AddStudentToCourse(ExtraStudent student, Course course)
         {
             GroupISU studentGroup = student.GetGroupIsu();
             GroupOGNP groupForSigning = null;
+            bool permission = false;
             if (studentGroup.Faculty == course.GetFaculty())
             {
                 if (!_allStudent.Contains(student))
@@ -98,12 +101,19 @@ namespace IsuExtra.Services
                 if (group.CountOfStudents() < group.GetMaxAmount())
                 {
                     groupForSigning = group;
+                    GroupOGNP checkGroup = PermissionForSigning(groupForSigning, student.GetGroupIsu().GetSchedule().GetSchedule());
+                    if (checkGroup == groupForSigning)
+                    {
+                        permission = true;
+                        break;
+                    }
                 }
             }
 
-            if (PermissionForSigning(groupForSigning, student.GetGroupIsu().GetSchedule().GetSchedule()))
+            if (permission && student.GetGroupOgnp() == null)
             {
                 course.Students.Add(student);
+                groupForSigning.Students.Add(student);
                 _signedStudents.Add(student);
                 if (!_allStudent.Contains(student))
                 {
@@ -114,7 +124,15 @@ namespace IsuExtra.Services
             }
             else
             {
-                throw new IsuExtraException("Error");
+                if (student.GetGroupOgnp() != null)
+                {
+                    throw new IsuExtraException("Student has already Ognp group");
+                }
+
+                if (permission == false)
+                {
+                    throw new IsuExtraException("Schedule doesn't fit");
+                }
             }
 
             return student;
@@ -175,7 +193,7 @@ namespace IsuExtra.Services
             return students;
         }
 
-        public Student RemoveStudentFromOgnp(ExtraStudent student, Course course)
+        public ExtraStudent RemoveStudentFromOgnp(ExtraStudent student, Course course)
         {
             foreach (var student_ in course.Students)
             {

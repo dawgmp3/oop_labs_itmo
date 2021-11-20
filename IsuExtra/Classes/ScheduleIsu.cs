@@ -5,18 +5,18 @@ namespace IsuExtra.Classes
 {
     public class ScheduleISU
     {
-        private List<LessonGroup> _lessons;
+        private List<Lesson> _lessons;
         public ScheduleISU()
         {
-            _lessons = new List<LessonGroup>();
+            _lessons = new List<Lesson>();
         }
 
-        public List<LessonGroup> GetSchedule()
+        public List<Lesson> GetSchedule()
         {
             return _lessons;
         }
 
-        public void AddLesson(LessonGroup lesson)
+        public void AddLesson(Lesson lesson)
         {
             _lessons.Add(lesson);
         }

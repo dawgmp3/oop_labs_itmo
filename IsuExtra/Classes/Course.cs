@@ -5,9 +5,9 @@ namespace IsuExtra.Classes
 {
     public class Course
     {
-        private static string _name;
-        private static string _faculty;
-        private static Flow _flow;
+        private string _name;
+        private string _faculty;
+        private Flow _flow;
         public Course(string name, string faculty, Flow flow)
         {
             _name = name;

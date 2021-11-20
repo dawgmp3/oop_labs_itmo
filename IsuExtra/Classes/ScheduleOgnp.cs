@@ -5,18 +5,18 @@ namespace IsuExtra.Classes
 {
     public class ScheduleOGNP
     {
-        private List<LessonOGNP> _lessons;
+        private List<Lesson> _lessons;
         public ScheduleOGNP()
         {
-            _lessons = new List<LessonOGNP>();
+            _lessons = new List<Lesson>();
         }
 
-        public List<LessonOGNP> GetSchedule()
+        public List<Lesson> GetSchedule()
         {
             return _lessons;
         }
 
-        public List<LessonOGNP> AddLesson(LessonOGNP lesson)
+        public List<Lesson> AddLesson(Lesson lesson)
         {
             _lessons.Add(lesson);
             return _lessons;
