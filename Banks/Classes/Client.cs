@@ -8,19 +8,15 @@ namespace Banks.Classes
         private static string _name;
         private static string _surname;
         private static string _address;
-        private static int _passport;
-        private static Guid _id;
-        private static int _money;
+        private static string _passport;
         private static Bank _bank;
         private static List<Account> _accounts;
-        public Client(string name, string surname, string address, int passport, Guid id, List<Account> accounts, int money, Bank bank)
+        public Client(string name, string surname, string address, string passport, List<Account> accounts, Bank bank)
         {
             _name = name;
             _surname = surname;
             _address = address;
             _passport = passport;
-            _id = id;
-            _money = money;
             _bank = bank;
             _accounts = accounts;
         }
@@ -28,26 +24,15 @@ namespace Banks.Classes
         public static ClientBuilder ToBuild(ClientBuilder client)
         {
             client.WithName(_name)
-                .WithSurname(_surname)
-                .WithAddress(_address)
-                .WithPassport(_passport)
-                .WithId(_id)
-                .WithAccount(_accounts)
-                .WithBank(_bank);
+                  .WithSurname(_surname)
+                  .WithAddress(_address)
+                  .WithPassport(_passport)
+                  .WithAccount()
+                  .WithBank(_bank);
             return client;
         }
 
-        public void SetCreditAccount(CreditAccount account)
-        {
-            _accounts.Add(account);
-        }
-
-        public void SetDebitAccount(DebitAccount account)
-        {
-            _accounts.Add(account);
-        }
-
-        public void SetDepositAccount(DepositAccount account)
+        public void AddAccount(Account account)
         {
             _accounts.Add(account);
         }
@@ -67,7 +52,7 @@ namespace Banks.Classes
             return _address;
         }
 
-        public int GetPassport()
+        public string GetPassport()
         {
             return _passport;
         }
@@ -80,11 +65,6 @@ namespace Banks.Classes
         public Bank GetBank()
         {
             return _bank;
-        }
-
-        public Guid GetId()
-        {
-            return _id;
         }
 
         public List<Account> GetAccounts()
@@ -134,24 +114,14 @@ namespace Banks.Classes
             return foundAccount;
         }
 
-        public int GetMoney()
-        {
-            return _money;
-        }
-
         public void SetAddress(string address)
         {
             _address = address;
         }
 
-        public void SetPassport(int passport)
+        public void SetPassport(string passport)
         {
             _passport = passport;
-        }
-
-        public void SetMoney(int money)
-        {
-            _money = money;
         }
 
         public class ClientBuilder
@@ -159,9 +129,7 @@ namespace Banks.Classes
             private string _name;
             private string _surname;
             private string _address;
-            private int _passport;
-            private Guid _id;
-            private int _money;
+            private string _passport;
             private List<Account> _accounts;
             private Bank _bank;
 
@@ -183,27 +151,15 @@ namespace Banks.Classes
                 return this;
             }
 
-            public ClientBuilder WithPassport(int passport)
+            public ClientBuilder WithPassport(string passport)
             {
                 _passport = passport;
                 return this;
             }
 
-            public ClientBuilder WithId(Guid id)
+            public ClientBuilder WithAccount()
             {
-                _id = id;
-                return this;
-            }
-
-            public ClientBuilder WithAccount(List<Account> account)
-            {
-                _accounts = account;
-                return this;
-            }
-
-            public ClientBuilder WithMoney(int money)
-            {
-                _money = money;
+                _accounts = new List<Account>();
                 return this;
             }
 
@@ -215,7 +171,7 @@ namespace Banks.Classes
 
             public Client Build()
             {
-                Client client = new Client(_name, _surname, _address, _passport, _id, _accounts, _money, _bank);
+                Client client = new Client(_name, _surname, _address, _passport, _accounts, _bank);
                 return client;
             }
         }

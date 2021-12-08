@@ -1,3 +1,4 @@
+using System;
 using Banks.Tools;
 
 namespace Banks.Classes
@@ -5,25 +6,25 @@ namespace Banks.Classes
     public class DepositAccount : Account
     {
         private double percentage;
-        public DepositAccount(Client client, int money)
-            : base(money)
+        public DepositAccount(int money, Guid id, string isDoubtful, Bank bank)
+            : base(money, id, isDoubtful, bank)
         {
             percentage = 0;
         }
 
-        public void OpenDepositAccount(Client client, int money)
+        public double CountPercentage(DepositAccount depositAccount)
         {
-            if (money < 50000)
+            if (depositAccount.GetMoney() < 50000)
             {
                 percentage = 3;
             }
 
-            if (money >= 50000 && money <= 100000)
+            if (depositAccount.GetMoney() >= 50000 && depositAccount.GetMoney() <= 100000)
             {
                 percentage = 3.5;
             }
 
-            client.SetDepositAccount(new DepositAccount(client, money));
+            return percentage;
         }
 
         public double GetPercentageOfAccount()
@@ -31,19 +32,14 @@ namespace Banks.Classes
             return percentage;
         }
 
-        public override void WithdrawMoney(Client client, int money)
+        public override void WithdrawMoney(Bank bank, Account account, int money)
         {
             throw new BanksException("You can not withdraw money from deposit account");
         }
 
-        public override void WithdrawMoneyToAnotherClient(Client clientSender, Client clientCatcher, int moneyToSend)
+        public override void TransferMoneyToAnotherClient(Account clientSender, Account clientCatcher, int moneyToSend)
         {
-            throw new BanksException("You can not send money to another client from debit account");
-        }
-
-        public override void GiveCommissionToAccount(Client client, CreditAccount creditAcc)
-        {
-            throw new BanksException("There are no commissions in Deposit Account");
+            throw new BanksException("You can not send money to another client from deposit account");
         }
     }
 }

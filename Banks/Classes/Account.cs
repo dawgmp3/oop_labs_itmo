@@ -1,14 +1,21 @@
 using System;
 using System.Collections.Generic;
+using Banks.Tools;
 
 namespace Banks.Classes
 {
-    public abstract class Account
+    public abstract class Account : IObserver
     {
         private int _money;
-        public Account(int money)
+        private Guid _id;
+        private string _isDoubtful;
+        private Bank _bank;
+        public Account(int money, Guid id, string isDoubtful, Bank bank)
         {
             _money = money;
+            _id = id;
+            _isDoubtful = isDoubtful;
+            _bank = bank;
         }
 
         public virtual int GetMoney()
@@ -16,55 +23,101 @@ namespace Banks.Classes
             return _money;
         }
 
-        public virtual int ToSeeHowMuchInSomeDays(int amountOfLoan, int percent, int amountOfDays)
+        public virtual void PutMoneyInAcc(Account account, int money)
         {
-            int plusMoney = amountOfLoan * percent / 100;
-            for (int i = 0; i < amountOfDays; i++)
+            account._money = _money + money;
+        }
+
+        public virtual void SetMoney(Account account, int money)
+        {
+            account._money = money;
+        }
+
+        public virtual int ToSeeHowMuchInSomeMonth(Bank bank, Account account, int amountOfMonth)
+        {
+            int final = account.GetMoney();
+            for (int i = 0; i < amountOfMonth; i++)
             {
-                int final = amountOfLoan + plusMoney;
+                final = final + (account.GetMoney() * bank.GetPersentage() / 100);
             }
 
-            return plusMoney;
+            return final;
         }
 
-        public virtual void WithdrawMoney(Client client, int money)
+        public virtual int ToSeeHowMuchInSomeYears(Bank bank, Account account, int amountOfYears)
         {
-            if (client.GetMoney() >= money && client.GetMoney() - money >= 0)
+            int percentInYear = bank.GetPersentage() * 12;
+            int final = account.GetMoney();
+            for (int i = 0; i < amountOfYears; i++)
             {
-                client.SetMoney(client.GetMoney() - money);
+                final = final + (account.GetMoney() * percentInYear / 100);
+            }
+
+            return final;
+        }
+
+        public virtual void WithdrawMoney(Bank bank, Account account, int money)
+        {
+            int limit = bank.GetLimit();
+            if (account._isDoubtful == "doubtful")
+            {
+                if (money > limit)
+                {
+                    throw new BanksException("client can not withdraw money above limit");
+                }
+            }
+
+            if (_money >= money)
+            {
+                _money = _money - money;
+            }
+            else
+            {
+                throw new BanksException("Not enough money");
             }
         }
 
-        public virtual void WithdrawMoneyToAnotherClient(Client clientSender, Client clientCatcher, int moneyToSend)
+        public virtual void SetMoney(int money)
         {
-            if (clientSender.GetMoney() >= moneyToSend && clientSender.GetMoney() - moneyToSend >= 0)
+            _money = money;
+        }
+
+        public Bank GetBank()
+        {
+            return _bank;
+        }
+
+        public virtual void TransferMoneyToAnotherClient(Account accountSender, Account accountCatcher, int moneyToSend)
+        {
+            if (accountSender._isDoubtful == "yes")
             {
-                clientSender.SetMoney(clientSender.GetMoney() - moneyToSend);
-                ToGetMoney(clientCatcher, moneyToSend);
+                if (moneyToSend > accountSender.GetBank().GetLimit())
+                {
+                    throw new BanksException("Client can not send money because he is doubtful");
+                }
+            }
+
+            if (accountSender.GetMoney() >= moneyToSend && accountSender.GetMoney() - moneyToSend >= 0)
+            {
+                accountSender.SetMoney(accountSender, accountSender.GetMoney() - moneyToSend);
+                accountCatcher.PutMoneyInAcc(accountCatcher, moneyToSend);
             }
         }
 
-        public virtual void ToGetMoney(Client client, int amountOfMoney)
+        public virtual string GetIsDoubtful()
         {
-            client.SetMoney(client.GetMoney() + amountOfMoney);
+            return _isDoubtful;
         }
 
-        public virtual void GiveCommissionToAccount(Client client, CreditAccount creditAcc)
+        public virtual void SetIsDoubtful(string isDoubtful)
         {
-            CreditAccount account = client.FindCreditAccount(creditAcc);
-            if (client.GetMoney() < account._money)
-            {
-                account.SetAmountOfMoneyNeedToReturn(account.GetAmountOfMoneyNeedToReturn() +
-                                                     (client.GetBank().GetPersentage() / 100 *
-                                                      account.GetAmountOfMoneyNeedToReturn()));
-            }
+            _isDoubtful = isDoubtful;
         }
 
-        public virtual void GivePercentagesToAccount(Client client, DebitAccount debitAccount, DepositAccount depositAccount)
+        public void Update(Account account, int percentage)
         {
-            DebitAccount debitAcc = client.FindDebitAccount(debitAccount);
-            DepositAccount depositAcc = client.FindDepositAccount(depositAccount);
-            client.SetMoney(client.GetMoney() + (client.GetBank().GetPersentage() / 100 * client.GetMoney()));
+            Bank bank = account._bank;
+            bank.SetPersentage(percentage);
         }
     }
 }
