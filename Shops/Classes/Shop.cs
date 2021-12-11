@@ -1,75 +1,73 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Shops.Tools;
 
 namespace Shops.Classes
 {
     public class Shop
     {
-        private static List<Product> _products;
-        public Shop(string name, string adress)
+        public Shop(string name, string address)
         {
             Name = name;
-            Adress = adress;
-            Id = GenerateId();
-            _products = new List<Product>();
+            Adress = address;
+            Id = Guid.NewGuid();
+            Products = new List<Product>();
         }
+
+        public List<Product> Products { get; }
 
         public string Name { get; }
         public string Adress { get; }
         public Guid Id { get; }
 
-        public void AddProduct(Product product)
+        public bool FindProducts(List<Product> products)
         {
-            _products.Add(product);
+            foreach (Product productInShop in Products)
+            {
+                foreach (var productToBuy in products)
+                {
+                    if (productToBuy.Name == productInShop.Name && productInShop.Amount >= productToBuy.Amount)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public Product FindProduct(Product product, int amount)
         {
-            foreach (Product productInShop in _products)
-            {
-                if (product.Name == productInShop.Name && productInShop.Amount >= amount)
-                {
-                    return productInShop;
-                }
-            }
-
-            return null;
+            return Products.FirstOrDefault(productInShop => product.Name == productInShop.Name && productInShop.Amount >= amount);
         }
 
         public Product RePrice(Product product, int price)
         {
-            foreach (var productInShop in _products)
+            foreach (var productInShop in Products.Where(productInShop => productInShop.Name == product.Name))
             {
-                if (productInShop.Name == product.Name)
-                {
-                    productInShop.Price = price;
-                    return productInShop;
-                }
+                productInShop.Price = price;
+                return productInShop;
             }
 
             throw new ShopException("No such product in shop");
         }
 
-        public int FindPrice(Product product, int amount)
+        public int FindPrice(List<Product> products)
         {
             int price = 0;
-            foreach (var productInShop in _products)
+            foreach (var productInShop in Products)
             {
-                if (product.Name == productInShop.Name && productInShop.Amount >= amount)
+                foreach (var productForBuying in products)
                 {
-                    price = productInShop.Price;
-                    return price;
+                    if (productForBuying.Name == productInShop.Name)
+                    {
+                        price += productInShop.Price * productForBuying.Amount;
+                    }
                 }
             }
 
-            throw new ShopException("No such product in shop");
-        }
-
-        private Guid GenerateId()
-        {
-            Guid id = Guid.NewGuid();
-            return id;
+            return price;
         }
     }
 }

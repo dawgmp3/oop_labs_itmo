@@ -25,32 +25,35 @@ namespace Shops.Tests
             Product product = new Product("Milk");
             Assert.Catch<ShopException>(() =>
             {
-                _shopService1.AddProduct(product, shop, 100, 101);
+                _shopService1.AddProductToShop(product, shop, 100, 101);
             });
         }
         
         [Test]
-        public void Price_RePrice_ThrowException()
+        public void PriceRePrice()
         {
             Shop shop = _shopService1.AddShop("Tokko", "Kirova");
             Product prodRegistr = _shopService1.ProductsRegistration("Milk", 10000);
-            Product prod = _shopService1.AddProduct(prodRegistr, shop, 100, 100);
+            Product prod = _shopService1.AddProductToShop(prodRegistr, shop, 100, 100);
             shop.RePrice(prod, 101);
             Assert.AreEqual(101, prod.Price);
         }
         
         [Test]
-        public void MinPrice_ThrowException()
+        public void FindMinPrice()
         {
             Shop shop1 = _shopService1.AddShop("Tokko", "Kirova");
             Shop shop2 = _shopService1.AddShop("Almaz", "Yaroslavskogo");
             Shop shop3 = _shopService1.AddShop("Meow", "Kirova");
             Product prodRegistr = _shopService1.ProductsRegistration("Butter", 10000);
-            Product product1 = _shopService1.AddProduct(prodRegistr, shop1, 99, 10);
-            Product product2 = _shopService1.AddProduct(prodRegistr, shop2, 100, 10);
-            Product product3 = _shopService1.AddProduct(prodRegistr, shop3, 10, 10);
+            Product product1 = _shopService1.AddProductToShop(prodRegistr, shop1, 99, 10);
+            Product product2 = _shopService1.AddProductToShop(prodRegistr, shop2, 10, 10);
+            Product product3 = _shopService1.AddProductToShop(prodRegistr, shop3, 100, 10);
             Product productt = new Product("Butter");
-            Shop shopp = _shopService1.FindMinimumPriceShop(productt, 11);
+            productt.Amount = 2;
+            List<Product> prd = new List<Product>();
+            prd.Add(productt);
+            Shop shopp = _shopService1.FindMinimumPriceShop(prd);
             Assert.AreEqual(shop3, shop3);
         }
 
@@ -62,19 +65,22 @@ namespace Shops.Tests
             Product butter = _shopService1.ProductsRegistration("Butter", 10000);
             Product banana = _shopService1.ProductsRegistration("Banana", 10000);
             Product prodMilk = new Product("Milk");
+            prodMilk.Amount = 10;
             Product prodButter = new Product("Butter");
+            prodButter.Amount = 6;
             Product prodBanana = new Product("Banana");
+            prodBanana.Amount = 2;
             List<Product> bucket = new List<Product>();
             bucket.Add(prodMilk);
             bucket.Add(prodButter);
             bucket.Add(prodBanana);
             Customer customer = new Customer("Misha", 1);
-            Product prod1 = _shopService1.AddProduct(milk, shop, 10, 10);
-            Product prod2 = _shopService1.AddProduct(butter, shop, 10, 10);
-            Product prod3 = _shopService1.AddProduct(banana, shop, 10, 10);
+            Product prod1 = _shopService1.AddProductToShop(milk, shop, 10, 10);
+            Product prod2 = _shopService1.AddProductToShop(butter, shop, 10, 10);
+            Product prod3 = _shopService1.AddProductToShop(banana, shop, 10, 10);
             Assert.Catch<ShopException>(() =>
             {
-                _shopService1.Purchase(customer, shop, 9, bucket);
+                _shopService1.Purchase(customer, shop, bucket);
             });
         }
 
@@ -82,15 +88,15 @@ namespace Shops.Tests
             public void Delivery_AreEqual()
             {
                 Shop shop = _shopService1.AddShop("Tokko", "Kirova");
-                Product milk = _shopService1.ProductsRegistration("Milk", 10000);
-                Product prodMilk = new Product("Milk");
+                Product milk = _shopService1.ProductsRegistration("Bread", 10000);
+                Product prodBread = new Product("Bread");
+                prodBread.Amount = 4;
                 List<Product> bucket = new List<Product>();
-                bucket.Add(prodMilk);
+                bucket.Add(prodBread);
                 Customer customer = new Customer("Misha", 10000);
-                Product prod1 = _shopService1.AddProduct(milk, shop, 10, 10);
-                _shopService1.Purchase(customer, shop, 1, bucket);
-                _shopService1.Purchase(customer, shop, 5, bucket);
-                Assert.AreEqual(6, customer.GetAmountOfProductInFridge(prodMilk));
+                Product prod1 = _shopService1.AddProductToShop(milk, shop, 10, 10);
+                _shopService1.Purchase(customer, shop, bucket);
+                Assert.AreEqual(4, customer.GetAmountOfCustomersProduct(prodBread));
             }
     }
 }

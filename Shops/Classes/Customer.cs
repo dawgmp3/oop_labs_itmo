@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Shops.Classes
 {
@@ -16,9 +17,9 @@ namespace Shops.Classes
         public string Name { get; }
         public int Wallet { get; set; }
 
-        public void AddProductToFridge(Product product, int amount)
+        public void AddProductToCustomer(Product product, int amount)
         {
-            Product newProduct = FindProductInFridge(product);
+            Product newProduct = FindCustomersProduct(product);
             if (newProduct != null)
             {
                 newProduct.Amount += amount;
@@ -26,32 +27,20 @@ namespace Shops.Classes
             else
             {
                 Products.Add(product);
-                AddProductToFridge(product, amount);
             }
         }
 
-        public Product FindProductInFridge(Product product)
+        public Product FindCustomersProduct(Product product)
         {
-            foreach (Product productInShop in Products)
-            {
-                if (product.Name == productInShop.Name)
-                {
-                    return productInShop;
-                }
-            }
-
-            return null;
+            return Products.FirstOrDefault(productInShop => product.Name == productInShop.Name);
         }
 
-        public int GetAmountOfProductInFridge(Product product)
+        public int GetAmountOfCustomersProduct(Product product)
         {
             int amount = 0;
-            foreach (var productInFridge in Products)
+            foreach (var customersProduct in Products.Where(customersProduct => product.Name == customersProduct.Name))
             {
-                if (product.Name == productInFridge.Name)
-                {
-                    amount = productInFridge.Amount;
-                }
+                amount = customersProduct.Amount;
             }
 
             return amount;
