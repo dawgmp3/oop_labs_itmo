@@ -83,12 +83,13 @@ namespace IsuExtra.Tests
             });
         }
         [Test]
-        public void AddStudentToCourse_HeHasOgnp()
+        public void AddStudentToCourse_HeHas2Ognp()
         {
             GroupName name = new GroupName("M3209");
             GroupISU group = new GroupISU(name, 20);
-            GroupOGNP groupOgnp1 = new GroupOGNP("2", 20);
             _ognp.AddLessonToGroup(group, "Maria", 1, 3, 111);
+            
+            GroupOGNP groupOgnp1 = new GroupOGNP("2", 20);
             Flow flow = new Flow("1");
             
             _ognp.AddLessonToFlow("Maria", 1, groupOgnp1, 2, 256);
@@ -96,16 +97,26 @@ namespace IsuExtra.Tests
             
             Course course = _ognp.AddCourse("Кибербез", "F", flow);
             
-            GroupOGNP groupOgnp1_2 = new GroupOGNP("2", 20);
+            GroupOGNP groupOgnp2 = new GroupOGNP("2", 20);
             Flow flow2 = new Flow("1");
             
-            _ognp.AddLessonToFlow("Maria", 1, groupOgnp1_2, 5, 256);
-            _ognp.AddGroupToFlow(flow2, groupOgnp1_2);
+            _ognp.AddLessonToFlow("Maria", 1, groupOgnp2, 5, 256);
+            _ognp.AddGroupToFlow(flow2, groupOgnp2);
             
             Course course2 = _ognp.AddCourse("Кибербезз", "L", flow2);
             
             ExtraStudent student = new ExtraStudent("Misha", new Guid(), group);
             _ognp.AddStudentToCourse(student, course2);
+            
+            GroupOGNP groupOgnp3 = new GroupOGNP("56", 30);
+            Flow flow3 = new Flow("5");
+            
+            _ognp.AddLessonToFlow("Maria", 1, groupOgnp3, 4, 256);
+            _ognp.AddGroupToFlow(flow3, groupOgnp3);
+            
+            Course course3 = _ognp.AddCourse("Кибербеззз", "G", flow3);
+            
+            _ognp.AddStudentToCourse(student, course3);
             Assert.Catch<IsuExtraException>(() =>
             {
                 _ognp.AddStudentToCourse(student, course);

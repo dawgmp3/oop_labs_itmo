@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Isu.Classes;
 using Isu.Services;
 using Isu.Tools;
@@ -15,12 +16,9 @@ namespace IsuExtra.Services
 
         public Course AddCourse(string name, string faculty, Flow flow)
         {
-            foreach (Course courseName in _allCourses)
+            if (_allCourses.Any(courseName => name == courseName.Name))
             {
-                if (name == courseName.GetName())
-                {
-                    throw new IsuExtraException("Course already exists");
-                }
+                throw new IsuExtraException("Course already exists");
             }
 
             Course newCourse = new Course(name, faculty, flow);
@@ -41,9 +39,8 @@ namespace IsuExtra.Services
             if (numberOfLesson <= maxCountOfLessons && day <= countOfDays)
             {
                 Lesson lesson = new Lesson(teacher, day, numberOfLesson, auditory);
-                ScheduleOGNP sched = group.GetSchedule();
-                sched.AddLesson(lesson);
-                group.SetSchedule(sched);
+                Schedule scheduleOgnp = group.Schedule;
+                scheduleOgnp.AddLesson(lesson);
                 return lesson;
             }
 
@@ -53,38 +50,48 @@ namespace IsuExtra.Services
         public Lesson AddLessonToGroup(GroupISU group, string teacher, int day, int time, int auditory)
         {
             Lesson lesson = new Lesson(teacher, day, time, auditory);
-            ScheduleISU sched = group.GetSchedule();
-            sched.AddLesson(lesson);
-            group.SetSchedule(sched);
+            Schedule scheduleIsu = group.Schedule;
+            scheduleIsu.AddLesson(lesson);
             return lesson;
         }
 
-        public GroupOGNP PermissionForSigning(GroupOGNP group, List<Lesson> isuLessons)
+        public bool HasScheduleIntersection(GroupOGNP group, List<Lesson> isuLessons, List<GroupOGNP> ognpGroups)
         {
-            GroupOGNP groupForSigning = null;
-            List<Lesson> lessons = group.GetSchedule().GetSchedule();
             foreach (var lesson in isuLessons)
             {
-                foreach (var groupLesson in lessons)
+                foreach (var groupLesson in group.Schedule.GetSchedule())
                 {
-                    if (lesson.GetNumberOfLesson() == groupLesson.GetNumberOfLesson() &&
-                        lesson.GetDay() == groupLesson.GetDay())
+                    if (lesson.NumberOfLesson == groupLesson.NumberOfLesson &&
+                        lesson.Day == groupLesson.Day)
                     {
-                        return null;
+                        return false;
                     }
                 }
             }
 
-            groupForSigning = group;
-            return groupForSigning;
+            foreach (var ognpGroup in ognpGroups)
+            {
+                foreach (var lesson in ognpGroup.Schedule.GetSchedule())
+                {
+                    foreach (var groupLesson in group.Schedule.GetSchedule())
+                    {
+                        if (lesson.NumberOfLesson == groupLesson.NumberOfLesson &&
+                            lesson.Day == groupLesson.Day)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         public ExtraStudent AddStudentToCourse(ExtraStudent student, Course course)
         {
-            GroupISU studentGroup = student.GetGroupIsu();
-            GroupOGNP groupForSigning = null;
-            bool permission = false;
-            if (studentGroup.Faculty == course.GetFaculty())
+            GroupISU studentGroup = student.GroupIsu;
+            GroupOGNP groupForSigning;
+            if (studentGroup.Faculty == course.Faculty)
             {
                 if (!_allStudent.Contains(student))
                 {
@@ -94,44 +101,33 @@ namespace IsuExtra.Services
                 throw new IsuExtraException("Student can not sign for this OGNP");
             }
 
-            Flow flowOfCourse = course.GetFlow();
-            List<GroupOGNP> groupsOfFlow = flowOfCourse.Groups;
-            foreach (var group in groupsOfFlow)
+            if (student.GroupsOgnp.Count == 2)
+            {
+                throw new IsuExtraException("Student has already 2 Ognp groups");
+            }
+
+            foreach (var group in course.FlowOfCourse.Groups)
             {
                 if (group.CountOfStudents() < group.GetMaxAmount())
                 {
                     groupForSigning = group;
-                    GroupOGNP checkGroup = PermissionForSigning(groupForSigning, student.GetGroupIsu().GetSchedule().GetSchedule());
-                    if (checkGroup == groupForSigning)
+                    if (HasScheduleIntersection(groupForSigning, student.GroupIsu.Schedule.GetSchedule(), student.GroupsOgnp)
+                        && student.GroupsOgnp.Count < 2)
                     {
-                        permission = true;
-                        break;
+                        course.Students.Add(student);
+                        groupForSigning.Students.Add(student);
+                        _signedStudents.Add(student);
+                        if (!_allStudent.Contains(student))
+                        {
+                            _allStudent.Add(student);
+                        }
+
+                        student.GroupsOgnp.Add(groupForSigning);
                     }
-                }
-            }
-
-            if (permission && student.GetGroupOgnp() == null)
-            {
-                course.Students.Add(student);
-                groupForSigning.Students.Add(student);
-                _signedStudents.Add(student);
-                if (!_allStudent.Contains(student))
-                {
-                    _allStudent.Add(student);
-                }
-
-                student.SetGroupOgnp(groupForSigning);
-            }
-            else
-            {
-                if (student.GetGroupOgnp() != null)
-                {
-                    throw new IsuExtraException("Student has already Ognp group");
-                }
-
-                if (permission == false)
-                {
-                    throw new IsuExtraException("Schedule doesn't fit");
+                    else
+                    {
+                        throw new IsuExtraException("Schedule doesn't fit");
+                    }
                 }
             }
 
@@ -140,67 +136,50 @@ namespace IsuExtra.Services
 
         public Flow GetFlows(Course course)
         {
-            return course.GetFlow();
+            return course.FlowOfCourse;
         }
 
         public List<ExtraStudent> GetStudentsOgnpGroup(GroupOGNP group)
         {
-            List<ExtraStudent> students = new List<ExtraStudent>();
             foreach (var course in _allCourses)
             {
-                Flow flow = course.GetFlow();
-                List<GroupOGNP> listOfGroups = flow.Groups;
-                foreach (var group_ in listOfGroups)
+                foreach (var groupInFlow in course.FlowOfCourse.Groups.Where(groupInFlow => group.GetName() == groupInFlow.GetName()))
                 {
-                    if (group.GetName() == group.GetName())
-                    {
-                        students = group_.Students;
-                        return students;
-                    }
+                    return groupInFlow.Students;
                 }
             }
 
             throw new IsuExtraException("No such group");
         }
 
-        public List<ExtraStudent> GetStudentsFromCourse(Course course, string name)
+        public List<ExtraStudent> GetStudentsFromCourse(Course course)
         {
-            List<ExtraStudent> students = new List<ExtraStudent>();
-            Flow flow = course.GetFlow();
-            foreach (var ognpGroup in flow.Groups)
-            {
-                if (ognpGroup.GetName() == name)
-                {
-                    students = ognpGroup.Students;
-                    return students;
-                }
-            }
-
-            throw new IsuExtraException("No such group");
+            return course.Students;
         }
 
         public List<ExtraStudent> GetNotSignedStudents()
         {
-            List<ExtraStudent> students = new List<ExtraStudent>();
-            foreach (var student in _allStudent)
-            {
-                if (!_signedStudents.Contains(student))
-                {
-                    students.Add(student);
-                }
-            }
-
-            return students;
+            return _allStudent.Where(student => !_signedStudents.Contains(student)).ToList();
         }
 
         public ExtraStudent RemoveStudentFromOgnp(ExtraStudent student, Course course)
         {
-            foreach (var student_ in course.Students)
+            foreach (var studentInCourse in course.Students)
             {
-                if (student.GetStudentId() == student_.GetStudentId())
+                if (student.GetStudentId() == studentInCourse.GetStudentId())
                 {
                     course.Students.Remove(student);
-                    student.SetGroupOgnp(null);
+                    foreach (var ognpGroup in course.FlowOfCourse.Groups)
+                    {
+                        foreach (var studentOgnpGroup in student.GroupsOgnp)
+                        {
+                            if (ognpGroup.GetName() == studentOgnpGroup.GetName())
+                            {
+                                student.GroupsOgnp.Remove(studentOgnpGroup);
+                                return student;
+                            }
+                        }
+                    }
                 }
             }
 

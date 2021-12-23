@@ -7,14 +7,15 @@ namespace IsuExtra.Classes
     {
         private string _name;
         private int _maxCount;
-        private ScheduleOGNP _schedule;
         public GroupOGNP(string name, int max)
         {
             _name = name;
             _maxCount = max;
             Students = new List<ExtraStudent>();
-            _schedule = new ScheduleOGNP();
+            Schedule = new Schedule();
         }
+
+        public Schedule Schedule { get; set; }
 
         public string Faculty { get; }
 
@@ -33,16 +34,6 @@ namespace IsuExtra.Classes
         public void AddStudent(ExtraStudent student)
         {
             Students.Add(student);
-        }
-
-        public ScheduleOGNP GetSchedule()
-        {
-            return _schedule;
-        }
-
-        public void SetSchedule(ScheduleOGNP schedule)
-        {
-            _schedule = schedule;
         }
 
         public int CountOfStudents()

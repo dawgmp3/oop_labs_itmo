@@ -3,10 +3,10 @@ using Isu.Classes;
 
 namespace IsuExtra.Classes
 {
-    public class ScheduleISU
+    public class Schedule
     {
         private List<Lesson> _lessons;
-        public ScheduleISU()
+        public Schedule()
         {
             _lessons = new List<Lesson>();
         }

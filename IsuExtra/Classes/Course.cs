@@ -5,47 +5,20 @@ namespace IsuExtra.Classes
 {
     public class Course
     {
-        private string _name;
-        private string _faculty;
-        private Flow _flow;
         public Course(string name, string faculty, Flow flow)
         {
-            _name = name;
-            _faculty = faculty;
+            Name = name;
+            Faculty = faculty;
             Students = new List<ExtraStudent>();
-            _flow = flow;
+            FlowOfCourse = flow;
         }
+
+        public Flow FlowOfCourse { get; set; }
+
+        public string Faculty { get; set; }
+
+        public string Name { get; set; }
 
         public List<ExtraStudent> Students { get; }
-
-        public string GetName() { return _name; }
-        public string GetFaculty() { return _faculty; }
-
-        public Flow GetFlow()
-        {
-            return _flow;
-        }
-
-        public void SetFlow(Flow flow)
-        {
-            _flow = flow;
-        }
-
-        public void AddStudent(ExtraStudent student)
-        {
-            Students.Add(student);
-        }
-
-        public int CountStudents()
-        {
-            int count = Students.Count;
-            return count;
-        }
-
-        public int GetAmountOfStudents()
-        {
-            int a = Students.Count;
-            return a;
-        }
     }
 }

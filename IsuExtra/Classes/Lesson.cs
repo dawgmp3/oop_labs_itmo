@@ -4,36 +4,20 @@ namespace IsuExtra.Classes
 {
     public class Lesson
     {
-        private string _teacher;
-        private int _day;
-        private int _numberOfLesson;
-        private int _auditory;
         public Lesson(string teacher, int day, int numberOfLesson, int auditory)
         {
-            _teacher = teacher;
-            _day = day;
-            _numberOfLesson = numberOfLesson;
-            _auditory = auditory;
+            Teacher = teacher;
+            Day = day;
+            NumberOfLesson = numberOfLesson;
+            Auditory = auditory;
         }
 
-        public string GetTeacher()
-        {
-            return _teacher;
-        }
+        public int Auditory { get; set; }
 
-        public int GetDay()
-        {
-            return _day;
-        }
+        public int NumberOfLesson { get; set; }
 
-        public int GetNumberOfLesson()
-        {
-            return _numberOfLesson;
-        }
+        public int Day { get; set; }
 
-        public int GetAuditory()
-        {
-            return _auditory;
-        }
+        public string Teacher { get; set; }
     }
 }

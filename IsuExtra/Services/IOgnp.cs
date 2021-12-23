@@ -13,11 +13,11 @@ namespace Isu.Services
         Lesson AddLessonToFlow(string teacher, int day, GroupOGNP group, int numberOfLesson, int auditory);
 
         Lesson AddLessonToGroup(GroupISU group, string teacher, int day, int numberOfLesson, int auditory);
-        GroupOGNP PermissionForSigning(GroupOGNP group, List<Lesson> lessons1);
+        bool HasScheduleIntersection(GroupOGNP group, List<Lesson> lessons, List<GroupOGNP> ognpGroups);
         ExtraStudent AddStudentToCourse(ExtraStudent student, Course course);
         Flow GetFlows(Course course);
         List<ExtraStudent> GetStudentsOgnpGroup(GroupOGNP group);
-        List<ExtraStudent> GetStudentsFromCourse(Course course, string name);
+        List<ExtraStudent> GetStudentsFromCourse(Course course);
         List<ExtraStudent> GetNotSignedStudents();
         ExtraStudent RemoveStudentFromOgnp(ExtraStudent student, Course course);
     }
