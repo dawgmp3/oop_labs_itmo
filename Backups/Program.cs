@@ -13,13 +13,13 @@ namespace Backups
         private static void Main()
         {
             BackupJob backupJob = new BackupJob();
-            BackupManager backupManager = new BackupManager(backupJob);
+
             IRepository repository = new LocalRepository(new DirectoryInfo(@"/Users/marinaburnaseva/Desktop/Directory11"));
             JobObject jobObject1 = new JobObject(new FileInfo(@"/Users/marinaburnaseva/Desktop/FileA"));
             JobObject jobObject2 = new JobObject(new FileInfo(@"/Users/marinaburnaseva/Desktop/FileB"));
             List<JobObject> jobObjects = new List<JobObject>() { jobObject1, jobObject2 };
             backupJob.AddListJobObjects(jobObjects);
-            backupManager.LaunchBackup(repository, new Single());
+            backupJob.LaunchBackup(repository, new Single());
         }
     }
 }

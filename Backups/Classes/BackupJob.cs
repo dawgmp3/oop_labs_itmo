@@ -1,61 +1,61 @@
 using System.Collections.Generic;
+using Backups.Services;
 
 namespace Backups.Classes
 {
     public class BackupJob
     {
-        private List<RestorePoint> _restorePoints;
-        private List<JobObject> _jobObjects;
         public BackupJob()
         {
-            _restorePoints = new List<RestorePoint>();
-            _jobObjects = new List<JobObject>();
+            RestorePoints = new List<RestorePoint>();
+            JobObjects = new List<JobObject>();
         }
+
+        public List<JobObject> JobObjects { get; set; }
+
+        public List<RestorePoint> RestorePoints { get; set; }
 
         public void AddPoint(RestorePoint point)
         {
-            _restorePoints.Add(point);
+            RestorePoints.Add(point);
         }
 
         public void DeletePoint(RestorePoint point)
         {
-            _restorePoints.Remove(point);
-        }
-
-        public List<RestorePoint> GetRestorePoints()
-        {
-            return _restorePoints;
+            RestorePoints.Remove(point);
         }
 
         public void AddJobObject(JobObject jobObject)
         {
-            _jobObjects.Add(jobObject);
+            JobObjects.Add(jobObject);
         }
 
         public void AddListJobObjects(List<JobObject> jobObjects)
         {
-            _jobObjects.AddRange(jobObjects);
+            JobObjects.AddRange(jobObjects);
         }
 
         public void DeleteJobObject(JobObject jobObject)
         {
-            _jobObjects.Remove(jobObject);
-        }
-
-        public List<JobObject> GetListJobObjects()
-        {
-            return _jobObjects;
+            JobObjects.Remove(jobObject);
         }
 
         public int GetNumberOfStorages()
         {
             int check = 0;
-            foreach (var restorePoint in _restorePoints)
+            foreach (var restorePoint in RestorePoints)
             {
-                check += restorePoint.GetStorages().Count;
+                check += restorePoint.Storages.Count;
             }
 
             return check;
+        }
+
+        public void LaunchBackup(IRepository repository, IAlgorithm algorithm)
+        {
+            List<Storage> storages = repository.MakeBackup(JobObjects, algorithm);
+            RestorePoint restorePoint = new RestorePoint(storages);
+            RestorePoints.Add(restorePoint);
         }
     }
 }

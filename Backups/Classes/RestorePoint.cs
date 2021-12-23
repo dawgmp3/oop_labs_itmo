@@ -4,15 +4,11 @@ namespace Backups.Classes
 {
     public class RestorePoint
     {
-        private List<Storage> _storage;
         public RestorePoint(List<Storage> storage)
         {
-            _storage = storage;
+            Storages = storage;
         }
 
-        public List<Storage> GetStorages()
-        {
-            return _storage;
-        }
+        public List<Storage> Storages { get; set; }
     }
 }
