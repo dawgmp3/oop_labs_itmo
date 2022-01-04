@@ -5,48 +5,32 @@ namespace Banks.Classes
 {
     public class CreditAccount : Account
     {
-        private int _amountOfMoneyToBorrow;
-        private int _amountOfMoneyNeedToReturn;
-        private string _isDoubtful;
-        public CreditAccount(int money, Guid id, string isDoubtful, Bank bank)
-            : base(money, id, isDoubtful, bank)
+        public CreditAccount(int money, Bank bank, Client client)
+            : base(money, bank, client)
         {
-            _amountOfMoneyToBorrow = money;
-            _amountOfMoneyNeedToReturn = money;
-            _isDoubtful = isDoubtful;
+            AmountOfMoneyToBorrow = money;
+            AmountOfMoneyNeedToReturn = money;
         }
 
-        public int GetAmountOfBorrowedMoney()
+        public int AmountOfMoneyNeedToReturn { get; set; }
+
+        public int AmountOfMoneyToBorrow { get; set; }
+        public override void WithdrawMoney(int money)
         {
-            return _amountOfMoneyToBorrow;
+            GetBank().GiveCommissionToCreditAccount(this);
         }
 
-        public int GetAmountOfMoneyNeedToReturn()
-        {
-            return _amountOfMoneyNeedToReturn;
-        }
-
-        public void SetAmountOfMoneyNeedToReturn(int money)
-        {
-            _amountOfMoneyNeedToReturn = money;
-        }
-
-        public void SetAmountOfMoneyToBorrow(int amountOfMoneyToBorrow)
-        {
-            _amountOfMoneyToBorrow = amountOfMoneyToBorrow;
-        }
-
-        public override void TransferMoneyToAnotherClient(Account accountSender, Account accountCatcher, int moneyToSend)
+        public override Transaction TransferMoneyToAnotherClient(Account accountSender, Account accountCatcher, int moneyToSend)
         {
             throw new BanksException("You can not withdraw money from credit acc");
         }
 
-        public override int ToSeeHowMuchInSomeMonth(Bank bank, Account account, int amountOfMonth)
+        public override int ToSeeHowMuchInSomeMonths(Bank bank, int amountOfMonth)
         {
             throw new BanksException("You can not count because it is credit acc");
         }
 
-        public override int ToSeeHowMuchInSomeYears(Bank bank, Account account, int amountOfYears)
+        public override int ToSeeHowMuchInSomeYears(Bank bank, int amountOfYears)
         {
             throw new BanksException("You can not count because it is credit acc");
         }

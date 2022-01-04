@@ -5,9 +5,18 @@ namespace Banks.Classes
 {
     public class DebitAccount : Account
     {
-        public DebitAccount(int money, int percent, Guid id, string isDoubtful, Bank bank)
-            : base(money, id, isDoubtful, bank)
+        public DebitAccount(int money, Bank bank, Client client)
+            : base(money, bank, client)
         {
+            AmountOfMoney = money;
+            BankOfAccount = bank;
+            ClientOfAccount = client;
         }
+
+        public Client ClientOfAccount { get; set; }
+
+        public Bank BankOfAccount { get; set; }
+
+        public int AmountOfMoney { get; set; }
     }
 }

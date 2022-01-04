@@ -5,123 +5,47 @@ namespace Banks.Classes
 {
     public class Client
     {
-        private static string _name;
-        private static string _surname;
-        private static string _address;
-        private static string _passport;
-        private static Bank _bank;
-        private static List<Account> _accounts;
         public Client(string name, string surname, string address, string passport, List<Account> accounts, Bank bank)
         {
-            _name = name;
-            _surname = surname;
-            _address = address;
-            _passport = passport;
-            _bank = bank;
-            _accounts = accounts;
+            Name = name;
+            Surname = surname;
+            Address = address;
+            Passport = passport;
+            BankClient = bank;
+            Accounts = accounts;
         }
 
-        public static ClientBuilder ToBuild(ClientBuilder client)
+        public List<Account> Accounts { get; set; }
+
+        public string Passport { get; set; }
+
+        public Bank BankClient { get; set; }
+
+        public string Address { get; set; }
+
+        public string Surname { get; set; }
+
+        public string Name { get; set; }
+        public bool CheckIsDoubtful()
         {
-            client.WithName(_name)
-                  .WithSurname(_surname)
-                  .WithAddress(_address)
-                  .WithPassport(_passport)
+            if (Passport != string.Empty && Address != string.Empty)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public ClientBuilder ToBuild()
+        {
+            ClientBuilder client = new ClientBuilder();
+            client.WithName(Name)
+                  .WithSurname(Surname)
+                  .WithAddress(Address)
+                  .WithPassport(Passport)
                   .WithAccount()
-                  .WithBank(_bank);
+                  .WithBank(BankClient);
             return client;
-        }
-
-        public void AddAccount(Account account)
-        {
-            _accounts.Add(account);
-        }
-
-        public string GetName()
-        {
-            return _name;
-        }
-
-        public string GetSurname()
-        {
-            return _surname;
-        }
-
-        public string GetAddress()
-        {
-            return _address;
-        }
-
-        public string GetPassport()
-        {
-            return _passport;
-        }
-
-        public void SetBank(Bank bank)
-        {
-            _bank = bank;
-        }
-
-        public Bank GetBank()
-        {
-            return _bank;
-        }
-
-        public List<Account> GetAccounts()
-        {
-            return _accounts;
-        }
-
-        public CreditAccount FindCreditAccount(CreditAccount account)
-        {
-            CreditAccount foundAccount = null;
-            foreach (var acc in _accounts)
-            {
-                if (acc == account)
-                {
-                    foundAccount = (CreditAccount)acc;
-                }
-            }
-
-            return foundAccount;
-        }
-
-        public DebitAccount FindDebitAccount(DebitAccount account)
-        {
-            DebitAccount foundAccount = null;
-            foreach (var acc in _accounts)
-            {
-                if (acc == account)
-                {
-                    foundAccount = (DebitAccount)acc;
-                }
-            }
-
-            return foundAccount;
-        }
-
-        public DepositAccount FindDepositAccount(DepositAccount account)
-        {
-            DepositAccount foundAccount = null;
-            foreach (var acc in _accounts)
-            {
-                if (acc == account)
-                {
-                    foundAccount = (DepositAccount)acc;
-                }
-            }
-
-            return foundAccount;
-        }
-
-        public void SetAddress(string address)
-        {
-            _address = address;
-        }
-
-        public void SetPassport(string passport)
-        {
-            _passport = passport;
         }
 
         public class ClientBuilder

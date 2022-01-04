@@ -1,37 +1,75 @@
 using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
+using Banks.Tools;
 
 namespace Banks.Classes
 {
-    public class Bank : IObservable
+    public class Bank : IObservable, IObserverBanks
     {
+        private List<Client> _doubtfulClients = new List<Client>();
         private string _name;
-        private string _statusOfCommission;
-        private string _statusOfPercentage;
-        private DateTime _dateOfCreation;
         private int _percentage;
         private int _commission;
         private int _limit;
         private List<IObserver> _notifications;
+        private int _highLimitDepositAcc;
+        private int _lowLimitDepositAcc;
+        private int _percentageHighLimit;
+        private int _percentageLowLimit;
         public Bank(string name)
         {
             _name = name;
+            _percentageLowLimit = 0;
+            _percentageHighLimit = 0;
+            _lowLimitDepositAcc = 0;
+            _highLimitDepositAcc = 0;
             Clients = new List<Client>();
-            _dateOfCreation = new DateTime(0);
             _percentage = 0;
             _commission = 0;
             _limit = 0;
-            _statusOfCommission = "No need for commissions this month";
-            _statusOfPercentage = "No need for giving percentage";
             _notifications = new List<IObserver>();
         }
 
         public List<Client> Clients { get; }
-
-        public void SetDayOfCreation()
+        public void SetHighLimitDepositAcc(int amountOfMoney)
         {
-            _dateOfCreation = DateTime.Today;
+            _highLimitDepositAcc = amountOfMoney;
+        }
+
+        public void SetLowLimitDepositAcc(int amountOfMoney)
+        {
+            _lowLimitDepositAcc = amountOfMoney;
+        }
+
+        public void SetHighPercentageDepositAcc(int percentage)
+        {
+            _percentageHighLimit = percentage;
+        }
+
+        public void SetLowPercentageDepositAcc(int percentage)
+        {
+            _percentageLowLimit = percentage;
+        }
+
+        public int GetHighLimitDepositAcc()
+        {
+            return _highLimitDepositAcc;
+        }
+
+        public int GetLowLimitDepositAcc()
+        {
+            return _lowLimitDepositAcc;
+        }
+
+        public int GetHighPercentageDepositAcc()
+        {
+            return _percentageHighLimit;
+        }
+
+        public int GetLowPercentageDepositAcc()
+        {
+            return _percentageLowLimit;
         }
 
         public string GetName()
@@ -42,11 +80,6 @@ namespace Banks.Classes
         public void AddClient(Client client)
         {
             Clients.Add(client);
-        }
-
-        public void ChangeStatusOfCommissions(string message)
-        {
-            _statusOfCommission = message;
         }
 
         public void SetPersentage(int percentage)
@@ -74,93 +107,44 @@ namespace Banks.Classes
             _commission = commission;
         }
 
-        public void ChangeStatusOfPersentage(string message)
-        {
-            _statusOfPercentage = message;
-        }
-
         public Account OpenCreditAccount(Client client, int amountOfMoneyToBorrow)
         {
-            if (client.GetPassport() == string.Empty || client.GetAddress() == string.Empty)
-            {
-                var creditAccount = new CreditAccount(amountOfMoneyToBorrow, Guid.NewGuid(), "doubtful", client.GetBank());
-                client.AddAccount(creditAccount);
-                return creditAccount;
-            }
-            else
-            {
-                var creditAccount = new CreditAccount(amountOfMoneyToBorrow, Guid.NewGuid(), "not doubtul", client.GetBank());
-                client.AddAccount(creditAccount);
-                return creditAccount;
-            }
+            var creditAccount = new CreditAccount(amountOfMoneyToBorrow, client.BankClient, client);
+            client.Accounts.Add(creditAccount);
+            return creditAccount;
         }
 
         public Account OpenDebitAccount(Client client, int money)
         {
-            if (client.GetPassport() == string.Empty || client.GetAddress() == string.Empty)
-            {
-                Account debitAccount = new DebitAccount(money, _percentage, Guid.NewGuid(), "doubtful", client.GetBank());
-                client.AddAccount(debitAccount);
-                return debitAccount;
-            }
-            else
-            {
-                Account debitAccount = new DebitAccount(money, _percentage, Guid.NewGuid(), "not doubtul", client.GetBank());
-                client.AddAccount(debitAccount);
-                return debitAccount;
-            }
+            Account debitAccount = new DebitAccount(money, client.BankClient, client);
+            client.Accounts.Add(debitAccount);
+            return debitAccount;
         }
 
         public Account OpenDepositAccount(Client client, int moneyToPutInAcc)
         {
-            if (client.GetPassport() == string.Empty || client.GetAddress() == string.Empty)
+            var depositAccount = new DepositAccount(moneyToPutInAcc, client.BankClient, client);
+            client.Accounts.Add(depositAccount);
+            return depositAccount;
+        }
+
+        public void GiveCommissionToCreditAccount(CreditAccount account)
+        {
+            if (account.AmountOfMoneyNeedToReturn < 0)
             {
-                var depositAccount = new DepositAccount(moneyToPutInAcc, Guid.NewGuid(), "doubtful", client.GetBank());
-                client.AddAccount(depositAccount);
-                return depositAccount;
-            }
-            else
-            {
-                var depositAccount = new DepositAccount(moneyToPutInAcc, Guid.NewGuid(), "not doubtul", client.GetBank());
-                client.AddAccount(depositAccount);
-                return depositAccount;
+                account.AmountOfMoneyNeedToReturn = account.AmountOfMoneyNeedToReturn +
+                                                    (_commission / 100 * account.AmountOfMoneyNeedToReturn);
             }
         }
 
-        public virtual void GiveCommissionToAccount(Client client, CreditAccount account)
+        public void GivePercentagesToDebitAccount(DebitAccount debitAccount)
         {
-            client.GetAccounts().Remove(account);
-            if (account.GetAmountOfMoneyNeedToReturn() < account.GetAmountOfBorrowedMoney())
-            {
-                account.SetAmountOfMoneyNeedToReturn(account.GetAmountOfMoneyNeedToReturn() +
-                                                     (client.GetBank().GetPersentage() / 100 *
-                                                     account.GetAmountOfMoneyNeedToReturn()));
-            }
-
-            client.GetAccounts().Add(account);
+            debitAccount.PutMoneyInAcc(_percentage / 100 * debitAccount.GetMoney());
         }
 
-        public void GivePercentagesToDebitAccount(Client client, DebitAccount debitAccount)
+        public void GivePercentagesToDepositAccount(DepositAccount depositAccount)
         {
-            debitAccount.SetMoney(debitAccount.GetMoney() + (client.GetBank().GetPersentage()
-                / 100 * debitAccount.GetMoney()));
-        }
-
-        public void GivePercentagesToDepositAccount(Client client, DepositAccount depositAccount)
-        {
-            depositAccount.SetMoney(depositAccount.GetMoney() + (client.GetBank().GetPersentage()
-                / 100 * depositAccount.GetMoney()));
-        }
-
-        public void CancellTransactionSendingMoney(Account accountSender, Account accountCatcher, int money)
-        {
-            accountSender.SetMoney(accountSender, accountSender.GetMoney() + money);
-            accountCatcher.SetMoney(accountCatcher, accountCatcher.GetMoney() - money);
-        }
-
-        public void CancellTransactionWithdrawMoney(Account account, int money)
-        {
-            account.SetMoney(account, account.GetMoney() + money);
+            depositAccount.PutMoneyInAcc(_percentage / 100 * depositAccount.GetMoney());
         }
 
         public void AddObserver(IObserver notification)
@@ -177,9 +161,58 @@ namespace Banks.Classes
         {
             foreach (var client in Clients)
             {
-                foreach (var account in client.GetAccounts())
+                foreach (var account in client.Accounts)
                 {
                     account.Update(account, _percentage);
+                }
+            }
+        }
+
+        public Client CreateClient(string name, string surname, string address = "", string passport = "")
+        {
+            var builder = new Client.ClientBuilder();
+            builder.WithName(name)
+                .WithSurname(surname)
+                .WithAddress(address)
+                .WithPassport(passport)
+                .WithAccount();
+            Client newClient = builder.Build();
+            _doubtfulClients.Add(newClient);
+            if (newClient.Name == null && newClient.Surname == null)
+            {
+                throw new BanksException("You can not registrate client w/o name and surname");
+            }
+
+            return newClient;
+        }
+
+        public void AddClientAddress(Client client, string address)
+        {
+            client.Address = address;
+        }
+
+        public void AddClientPassport(Client client, string passport)
+        {
+            client.Passport = passport;
+        }
+
+        public void UpdateBanks(CentralBank bank)
+        {
+            foreach (var client in Clients)
+            {
+                foreach (CreditAccount acc in client.Accounts)
+                {
+                    GiveCommissionToCreditAccount(acc);
+                }
+
+                foreach (DebitAccount acc in client.Accounts)
+                {
+                    GivePercentagesToDebitAccount(acc);
+                }
+
+                foreach (DepositAccount acc in client.Accounts)
+                {
+                    GivePercentagesToDepositAccount(acc);
                 }
             }
         }

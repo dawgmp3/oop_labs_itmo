@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Banks.Tools;
 
 namespace Banks.Classes
 {
     public class CentralBank
     {
         private List<Bank> _allBanks = new List<Bank>();
-        private List<Client> _doubtfulClients = new List<Client>();
         public Bank BankRegistration(Bank bank, int percentage, int comission, int limit)
         {
             bank.SetPersentage(percentage);
@@ -15,50 +15,23 @@ namespace Banks.Classes
             return bank;
         }
 
-        public void Notification()
+        public void CancelTransactionTransfer(Transaction transaction)
         {
-            string comission = "Pay comission";
-            string paymentOfPercentage = "Pay percentage";
-            foreach (var bank in _allBanks)
+            if (transaction.Status)
             {
-                bank.ChangeStatusOfCommissions(comission);
-                bank.ChangeStatusOfPersentage(paymentOfPercentage);
+                transaction.AccountSender.PutMoneyInAcc(transaction.AmountOfMoney);
+                transaction.AccountCatcher.WithdrawMoney(transaction.AmountOfMoney);
+                transaction.Status = false;
             }
         }
 
-        public Client CreateClient(string name, string surname, string address = "", string passport = "")
+        public void CancelTransactionWithdraw(Transaction transaction)
         {
-            var builder = new Client.ClientBuilder();
-            Client.ClientBuilder clientToBuild = Client.ToBuild(builder);
-            clientToBuild.WithName(name)
-                .WithSurname(surname)
-                .WithAddress(address)
-                .WithPassport(passport)
-                .WithAccount();
-            Client newClient = clientToBuild.Build();
-            _doubtfulClients.Add(newClient);
-            return newClient;
-        }
-
-        public int CheckDoubtfulClient(Client client)
-        {
-            int check = 0;
-            if (_doubtfulClients.Contains(client))
+            if (transaction.Status)
             {
-                check = 1;
+                transaction.AccountSender.PutMoneyInAcc(transaction.AmountOfMoney);
+                transaction.Status = false;
             }
-
-            return check;
-        }
-
-        public void AddClientAddress(Client client, string address)
-        {
-            client.SetAddress(address);
-        }
-
-        public void AddClientPassport(Client client, string passport)
-        {
-            client.SetPassport(passport);
         }
 
         public void ChangePercentage(Bank bank, int percentage)

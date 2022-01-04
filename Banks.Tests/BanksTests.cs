@@ -19,12 +19,12 @@ namespace Banks.Tests
         {
             Bank bank = new Bank("ProtectorOfMoney");
             _centralBank.BankRegistration(bank, 10, 10, 100000);
-            Client client = _centralBank.CreateClient("Misha", "Makarov");
+            Client client = bank.CreateClient("Misha", "Makarov");
             bank.AddClient(client);
             Account debitAccount = bank.OpenDebitAccount(client, 100);
             Assert.Catch<BanksException>(() =>
             {
-                debitAccount.WithdrawMoney(bank, debitAccount,1000);
+                debitAccount.WithdrawMoney(1000);
             });
         }
         [Test]
@@ -32,12 +32,12 @@ namespace Banks.Tests
         {
             Bank bank = new Bank("ProtectorOfMoney");
             _centralBank.BankRegistration(bank, 10, 10, 100000);
-            Client client = _centralBank.CreateClient("Misha", "Makarov");
+            Client client = bank.CreateClient("Misha", "Makarov");
             bank.AddClient(client);
             Account depositAccount = bank.OpenDepositAccount(client, 100);
             Assert.Catch<BanksException>(() =>
             {
-                depositAccount.WithdrawMoney(bank, depositAccount,10);
+                depositAccount.WithdrawMoney(10);
             });
         }
         [Test]
@@ -45,12 +45,12 @@ namespace Banks.Tests
         {
             Bank bank = new Bank("ProtectorOfMoney");
             _centralBank.BankRegistration(bank, 10, 10, 10000);
-            Client client = _centralBank.CreateClient("Misha", "Makarov");
+            Client client = bank.CreateClient("Misha", "Makarov");
             bank.AddClient(client);
             Account depositAccount = bank.OpenDepositAccount(client, 100);
             Bank bank2 = new Bank("Meow");
             _centralBank.BankRegistration(bank2, 20, 20, 100000);
-            Client client2 = _centralBank.CreateClient("Masha", "Marievna");
+            Client client2 = bank.CreateClient("Masha", "Marievna");
             bank.AddClient(client2);
             Account depositAccount2 = bank.OpenDepositAccount(client2, 100);
             Assert.Catch<BanksException>(() =>
@@ -63,12 +63,12 @@ namespace Banks.Tests
         {
             Bank bank = new Bank("ProtectorOfMoney");
             _centralBank.BankRegistration(bank, 10, 10, 100);
-            Client client = _centralBank.CreateClient("Misha", "Makarov");
+            Client client = bank.CreateClient("Misha", "Makarov");
             bank.AddClient(client);
             Account depositAccount = bank.OpenDepositAccount(client, 1000000);
             Assert.Catch<BanksException>(() =>
             {
-                depositAccount.WithdrawMoney(bank, depositAccount,10000);
+                depositAccount.WithdrawMoney(10000);
             });
         }
 
@@ -77,40 +77,29 @@ namespace Banks.Tests
         {
             Bank bank = new Bank("Meow");
             _centralBank.BankRegistration(bank, 10, 10, 1000000);
-            Client client = _centralBank.CreateClient("Misha", "Makarov");
+            Client client = bank.CreateClient("Misha", "Makarov");
             bank.AddClient(client);
+            bank.AddClientPassport(client,"45678");
+            bank.AddClientAddress(client, "Kirova");
             Account debitAccount = bank.OpenDebitAccount(client, 10000);
             Bank bank1 = new Bank("Bark");
             _centralBank.BankRegistration(bank1, 10, 10, 1000000);
-            Client client1 = _centralBank.CreateClient("Misha", "Makarov");
+            Client client1 = bank.CreateClient("Misha", "Makarov");
             bank.AddClient(client);
             Account debitAccount1 = bank.OpenDebitAccount(client1, 1000);
-            debitAccount.TransferMoneyToAnotherClient(debitAccount, debitAccount1, 1);
-            Assert.AreEqual(1001, debitAccount1.GetMoney());
+            debitAccount.TransferMoneyToAnotherClient(debitAccount, debitAccount1, 2);
+            Assert.AreEqual(1002, debitAccount1.GetMoney());
         }
         [Test]
         public void FutureAmountOfMoneyInAYear()
         {
             Bank bank = new Bank("Meow");
             _centralBank.BankRegistration(bank, 10, 10, 1000000);
-            Client client = _centralBank.CreateClient("Misha", "Makarov");
+            Client client = bank.CreateClient("Misha", "Makarov");
             bank.AddClient(client);
             Account depositAccount = bank.OpenDepositAccount(client, 10);
-            int amountOfMoney = depositAccount.ToSeeHowMuchInSomeYears(bank, depositAccount, 1);
+            int amountOfMoney = depositAccount.ToSeeHowMuchInSomeYears(bank, 1);
             Assert.AreEqual(22, amountOfMoney);
-        }
-        [Test]
-        public void DoubtfulClientTriesToWithdrawALotOfMoney()
-        {
-            Bank bank = new Bank("ProtectorOfMoney");
-            _centralBank.BankRegistration(bank, 10, 10, 1000);
-            Client client = _centralBank.CreateClient("Misha", "Makarov");
-            bank.AddClient(client);
-            Account debitAccount = bank.OpenDebitAccount(client, 10000);
-            Assert.Catch<BanksException>(() =>
-            {
-                debitAccount.WithdrawMoney(bank, debitAccount,9999);
-            });
         }
     }
 }

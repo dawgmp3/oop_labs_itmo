@@ -6,22 +6,24 @@ namespace Banks.Classes
     public class DepositAccount : Account
     {
         private double percentage;
-        public DepositAccount(int money, Guid id, string isDoubtful, Bank bank)
-            : base(money, id, isDoubtful, bank)
+        public DepositAccount(int money, Bank bank, Client client)
+            : base(money, bank, client)
         {
-            percentage = 0;
+            BankAccount = bank;
         }
+
+        public Bank BankAccount { get; set; }
 
         public double CountPercentage(DepositAccount depositAccount)
         {
-            if (depositAccount.GetMoney() < 50000)
+            if (depositAccount.GetMoney() > BankAccount.GetHighLimitDepositAcc())
             {
-                percentage = 3;
+                percentage = depositAccount.BankAccount.GetHighPercentageDepositAcc();
             }
 
-            if (depositAccount.GetMoney() >= 50000 && depositAccount.GetMoney() <= 100000)
+            if (depositAccount.GetMoney() <= BankAccount.GetLowLimitDepositAcc())
             {
-                percentage = 3.5;
+                percentage = depositAccount.BankAccount.GetLowPercentageDepositAcc();
             }
 
             return percentage;
@@ -32,12 +34,12 @@ namespace Banks.Classes
             return percentage;
         }
 
-        public override void WithdrawMoney(Bank bank, Account account, int money)
+        public override void WithdrawMoney(int money)
         {
             throw new BanksException("You can not withdraw money from deposit account");
         }
 
-        public override void TransferMoneyToAnotherClient(Account clientSender, Account clientCatcher, int moneyToSend)
+        public override Transaction TransferMoneyToAnotherClient(Account clientSender, Account clientCatcher, int moneyToSend)
         {
             throw new BanksException("You can not send money to another client from deposit account");
         }

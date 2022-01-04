@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace Banks.Classes
 {
-    public interface IObserver
+    public interface IObserverBanks
     {
-        void Update(Account account, int percentage);
+        void UpdateBanks(CentralBank bank);
     }
 }
