@@ -19,6 +19,6 @@ namespace Isu.Services
         List<ExtraStudent> GetStudentsOgnpGroup(GroupOGNP group);
         List<ExtraStudent> GetStudentsFromCourse(Course course);
         List<ExtraStudent> GetNotSignedStudents();
-        ExtraStudent RemoveStudentFromOgnp(ExtraStudent student, Course course);
+        ExtraStudent RemoveStudentFromOgnp1(ExtraStudent student, Course course);
     }
 }

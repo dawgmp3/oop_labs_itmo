@@ -162,28 +162,23 @@ namespace IsuExtra.Services
             return _allStudent.Where(student => !_signedStudents.Contains(student)).ToList();
         }
 
-        public ExtraStudent RemoveStudentFromOgnp(ExtraStudent student, Course course)
+        public ExtraStudent RemoveStudentFromOgnp1(ExtraStudent student, Course course)
         {
-            foreach (var studentInCourse in course.Students)
+            foreach (var group in course.FlowOfCourse.Groups)
             {
-                if (student.GetStudentId() == studentInCourse.GetStudentId())
+                foreach (var studentInGroupOgnp in group.Students)
                 {
-                    course.Students.Remove(student);
-                    foreach (var ognpGroup in course.FlowOfCourse.Groups)
+                    if (student.GetStudentId() == studentInGroupOgnp.GetStudentId())
                     {
-                        foreach (var studentOgnpGroup in student.GroupsOgnp)
-                        {
-                            if (ognpGroup.GetName() == studentOgnpGroup.GetName())
-                            {
-                                student.GroupsOgnp.Remove(studentOgnpGroup);
-                                return student;
-                            }
-                        }
+                        course.Students.Remove(student);
+                        group.Students.Remove(student);
+                        student.GroupsOgnp.Remove(group);
+                        return student;
                     }
                 }
             }
 
-            throw new IsuExtraException("No such student in OGNP course");
+            throw new IsuExtraException("No student");
         }
     }
 }

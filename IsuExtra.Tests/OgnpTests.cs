@@ -54,7 +54,7 @@ namespace IsuExtra.Tests
             ExtraStudent student1 = new ExtraStudent("Misha1", new Guid(), group);
             Assert.Catch<IsuExtraException>(() =>
             {
-                _ognp.RemoveStudentFromOgnp(student1, course);
+                _ognp.RemoveStudentFromOgnp1(student1, course);
             });
         }
         [Test]
@@ -122,5 +122,24 @@ namespace IsuExtra.Tests
                 _ognp.AddStudentToCourse(student, course);
             });
         }
+        [Test]
+        public void Remove()
+        {
+            GroupName name = new GroupName("M3209");
+            GroupISU group = new GroupISU(name, 20);
+            GroupOGNP groupOgnp1 = new GroupOGNP("2", 20);
+            _ognp.AddLessonToGroup(group, "Maria", 2, 2, 111);
+            Flow flow = new Flow("1");
+            
+            _ognp.AddLessonToFlow("Maria", 1, groupOgnp1, 3, 256);
+            _ognp.AddGroupToFlow(flow, groupOgnp1);
+            
+            Course course = _ognp.AddCourse("Кибербез", "F", flow);
+            List<ExtraStudent> students = course.Students;
+            ExtraStudent student = new ExtraStudent("Misha", new Guid(), group);
+            _ognp.AddStudentToCourse(student, course);
+            _ognp.RemoveStudentFromOgnp1(student, course);
+            Assert.AreEqual(students, course.Students);
+            }
     }
 }
