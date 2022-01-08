@@ -38,9 +38,10 @@ namespace Shops.Classes
         public int GetAmountOfCustomersProduct(Product product)
         {
             int amount = 0;
-            foreach (var customersProduct in Products.Where(customersProduct => product.Name == customersProduct.Name))
+            Product prod = Products.FirstOrDefault(customersProduct => product.Name == customersProduct.Name);
+            if (prod != null)
             {
-                amount = customersProduct.Amount;
+                amount = prod.Amount;
             }
 
             return amount;

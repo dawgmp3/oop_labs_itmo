@@ -46,15 +46,15 @@ namespace Shops.Tests
             Shop shop2 = _shopService1.AddShop("Almaz", "Yaroslavskogo");
             Shop shop3 = _shopService1.AddShop("Meow", "Kirova");
             Product prodRegistr = _shopService1.ProductsRegistration("Butter", 10000);
-            Product product1 = _shopService1.AddProductToShop(prodRegistr, shop1, 99, 10);
-            Product product2 = _shopService1.AddProductToShop(prodRegistr, shop2, 10, 10);
-            Product product3 = _shopService1.AddProductToShop(prodRegistr, shop3, 100, 10);
-            Product productt = new Product("Butter");
-            productt.Amount = 2;
+            _shopService1.AddProductToShop(prodRegistr, shop1, 99, 10);
+            _shopService1.AddProductToShop(prodRegistr, shop2, 10, 10);
+            _shopService1.AddProductToShop(prodRegistr, shop3, 100, 10);
+            Product product = new Product("Butter");
+            product.Amount = 2;
             List<Product> prd = new List<Product>();
-            prd.Add(productt);
-            Shop shopp = _shopService1.FindMinimumPriceShop(prd);
-            Assert.AreEqual(shop3, shop3);
+            prd.Add(product);
+            _shopService1.FindMinimumPriceShop(prd);
+            Assert.AreEqual(shop2, shop2);
         }
 
         [Test]
@@ -85,18 +85,29 @@ namespace Shops.Tests
         }
 
         [Test]
-            public void Delivery_AreEqual()
-            {
-                Shop shop = _shopService1.AddShop("Tokko", "Kirova");
-                Product milk = _shopService1.ProductsRegistration("Bread", 10000);
-                Product prodBread = new Product("Bread");
-                prodBread.Amount = 4;
-                List<Product> bucket = new List<Product>();
-                bucket.Add(prodBread);
-                Customer customer = new Customer("Misha", 10000);
-                Product prod1 = _shopService1.AddProductToShop(milk, shop, 10, 10);
-                _shopService1.Purchase(customer, shop, bucket);
-                Assert.AreEqual(4, customer.GetAmountOfCustomersProduct(prodBread));
-            }
+        public void Delivery_AreEqual()
+        {
+            Shop shop = _shopService1.AddShop("Tokko", "Kirova");
+            Product milk = _shopService1.ProductsRegistration("Bread", 10000);
+            Product prodBread = new Product("Bread");
+            prodBread.Amount = 4;
+            List<Product> bucket = new List<Product>();
+            bucket.Add(prodBread);
+            Customer customer = new Customer("Misha", 10000);
+            Product prod1 = _shopService1.AddProductToShop(milk, shop, 10, 10);
+            _shopService1.Purchase(customer, shop, bucket);
+            Assert.AreEqual(4, customer.GetAmountOfCustomersProduct(prodBread));
+        }
+        [Test]
+        public void AddProduct_Amount()
+        {
+            Shop shop = _shopService1.AddShop("Tokko", "Kirova");
+            _shopService1.ProductsRegistration("Milk", 1000); 
+            Product product = new Product("Milk");
+            _shopService1.AddProductToShop(product, shop, 100, 101);
+            _shopService1.AddProductToShop(product, shop, 100, 2);
+            Product p = shop.FindProduct(product, product.Amount);
+            Assert.AreEqual(103, p.Amount);
+        }
     }
 }

@@ -36,32 +36,29 @@ namespace Shops.Services
 
         public Product AddProductToShop(Product product, Shop shop, int price, int amount)
         {
-            foreach (Product productInStorage in _storage)
+            if (_storage.FirstOrDefault(prodInStorage =>
+                product.Name == prodInStorage.Name && prodInStorage.Amount >= amount) == null)
             {
-                if (product.Name == productInStorage.Name && productInStorage.Amount >= amount)
+                throw new ShopException("No product in storage");
+            }
+
+            if (shop.Products.Find(productInShop => productInShop.Name == product.Name) != null)
+            {
+                foreach (var prodInShop in shop.Products)
                 {
-                    Product prod = shop.FindProduct(product, amount);
-                    if (prod != null)
+                    if (prodInShop.Name == product.Name)
                     {
-                        prod.Amount += amount;
-                        return prod;
+                        prodInShop.Amount += amount;
+                        return product;
                     }
                 }
             }
 
-            foreach (Product productInStorage in _storage)
-            {
-                if (product.Name == productInStorage.Name && productInStorage.Amount >= amount)
-                {
-                    var newProd = new Product(product.Name);
-                    newProd.Amount = amount;
-                    newProd.Price = price;
-                    shop.Products.Add(newProd);
-                    return newProd;
-                }
-            }
-
-            throw new ShopException("No product in storage");
+            var newProd = new Product(product.Name);
+            newProd.Amount = amount;
+            newProd.Price = price;
+            shop.Products.Add(newProd);
+            return newProd;
         }
 
         public Shop Purchase(Customer customer, Shop shop, List<Product> products)

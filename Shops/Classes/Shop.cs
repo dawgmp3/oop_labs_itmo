@@ -23,15 +23,19 @@ namespace Shops.Classes
 
         public bool FindProducts(List<Product> products)
         {
-            foreach (Product productInShop in Products)
+            int amountOfProducts = products.Count;
+            int result = 0;
+            foreach (var product in products)
             {
-                foreach (var productToBuy in products)
+                if (FindProduct(product, product.Amount) != null)
                 {
-                    if (productToBuy.Name == productInShop.Name && productInShop.Amount >= productToBuy.Amount)
-                    {
-                        return true;
-                    }
+                    result += 1;
                 }
+            }
+
+            if (result == amountOfProducts)
+            {
+                return true;
             }
 
             return false;
@@ -44,7 +48,8 @@ namespace Shops.Classes
 
         public Product RePrice(Product product, int price)
         {
-            foreach (var productInShop in Products.Where(productInShop => productInShop.Name == product.Name))
+            Product productInShop = Products.FirstOrDefault(prduct => prduct.Name == product.Name);
+            if (productInShop != null)
             {
                 productInShop.Price = price;
                 return productInShop;
