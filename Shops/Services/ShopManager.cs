@@ -42,16 +42,11 @@ namespace Shops.Services
                 throw new ShopException("No product in storage");
             }
 
-            if (shop.Products.Find(productInShop => productInShop.Name == product.Name) != null)
+            Product productInShop = shop.Products.Find(productInShop => productInShop.Name == product.Name);
+            if (productInShop != null)
             {
-                foreach (var prodInShop in shop.Products)
-                {
-                    if (prodInShop.Name == product.Name)
-                    {
-                        prodInShop.Amount += amount;
-                        return product;
-                    }
-                }
+                productInShop.Amount += amount;
+                return productInShop;
             }
 
             var newProd = new Product(product.Name);
