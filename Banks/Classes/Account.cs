@@ -63,6 +63,7 @@ namespace Banks.Classes
             {
                 _money = _money - money;
                 Transaction transaction = new Transaction(money, null, this);
+                _bank.AddTransaction(transaction);
             }
             else
             {
@@ -75,23 +76,24 @@ namespace Banks.Classes
             return _bank;
         }
 
-        public virtual Transaction TransferMoneyToAnotherClient(Account accountSender, Account accountCatcher, int moneyToSend)
+        public virtual Transaction TransferMoneyToAnotherClient(Account accountCatcher, int moneyToSend)
         {
-            if (!accountSender._client.CheckIsDoubtful())
+            if (!_client.CheckIsDoubtful())
             {
-                if (moneyToSend > accountSender.GetBank().GetLimit())
+                if (moneyToSend > GetBank().GetLimit())
                 {
                     throw new BanksException("Client can not send money because he is doubtful");
                 }
             }
 
-            if (accountSender.GetMoney() >= moneyToSend)
+            if (GetMoney() >= moneyToSend)
             {
-                accountSender.WithdrawMoney(moneyToSend);
+                WithdrawMoney(moneyToSend);
                 accountCatcher.PutMoneyInAcc(moneyToSend);
             }
 
-            Transaction transaction = new Transaction(moneyToSend, accountCatcher, accountSender);
+            Transaction transaction = new Transaction(moneyToSend, accountCatcher, this);
+            _bank.AddTransaction(transaction);
             return transaction;
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Banks.Tools;
 
 namespace Banks.Classes
@@ -15,22 +16,26 @@ namespace Banks.Classes
             return bank;
         }
 
-        public void CancelTransactionTransfer(Transaction transaction)
+        public void CancelTransactionTransfer(Transaction transaction, Bank bank)
         {
-            if (transaction.Status)
+            Transaction transactionToCancell = bank.GetTransactions()
+                .FirstOrDefault(transactionInBank => transactionInBank.Id == transaction.Id);
+            if (transactionToCancell != null && transaction.Status)
             {
-                transaction.AccountSender.PutMoneyInAcc(transaction.AmountOfMoney);
-                transaction.AccountCatcher.WithdrawMoney(transaction.AmountOfMoney);
-                transaction.Status = false;
+                transactionToCancell.AccountSender.PutMoneyInAcc(transaction.AmountOfMoney);
+                transactionToCancell.AccountCatcher.WithdrawMoney(transaction.AmountOfMoney);
+                transactionToCancell.Status = false;
             }
         }
 
-        public void CancelTransactionWithdraw(Transaction transaction)
+        public void CancelTransactionWithdraw(Transaction transaction, Bank bank)
         {
-            if (transaction.Status)
+            Transaction transactionToCancell = bank.GetTransactions()
+                .FirstOrDefault(transactionInBank => transactionInBank.Id == transaction.Id);
+            if (transactionToCancell != null && transaction.Status)
             {
-                transaction.AccountSender.PutMoneyInAcc(transaction.AmountOfMoney);
-                transaction.Status = false;
+                transactionToCancell.AccountSender.PutMoneyInAcc(transaction.AmountOfMoney);
+                transactionToCancell.Status = false;
             }
         }
 

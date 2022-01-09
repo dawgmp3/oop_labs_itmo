@@ -20,7 +20,7 @@ namespace Banks.Classes
             GetBank().GiveCommissionToCreditAccount(this);
         }
 
-        public override Transaction TransferMoneyToAnotherClient(Account accountSender, Account accountCatcher, int moneyToSend)
+        public override Transaction TransferMoneyToAnotherClient(Account accountCatcher, int moneyToSend)
         {
             throw new BanksException("You can not withdraw money from credit acc");
         }

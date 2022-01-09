@@ -17,6 +17,7 @@ namespace Banks.Classes
         private int _lowLimitDepositAcc;
         private int _percentageHighLimit;
         private int _percentageLowLimit;
+        private List<Transaction> _transactions;
         public Bank(string name)
         {
             _name = name;
@@ -29,9 +30,21 @@ namespace Banks.Classes
             _commission = 0;
             _limit = 0;
             _notifications = new List<IObserver>();
+            _transactions = new List<Transaction>();
         }
 
         public List<Client> Clients { get; }
+
+        public void AddTransaction(Transaction transaction)
+        {
+            _transactions.Add(transaction);
+        }
+
+        public List<Transaction> GetTransactions()
+        {
+            return _transactions;
+        }
+
         public void SetHighLimitDepositAcc(int amountOfMoney)
         {
             _highLimitDepositAcc = amountOfMoney;

@@ -90,7 +90,7 @@ namespace Banks
             {
                 Console.WriteLine("How much?");
                 int money = Convert.ToInt32(Console.ReadLine());
-                account.TransferMoneyToAnotherClient(account, account1, money);
+                account.TransferMoneyToAnotherClient(account1, money);
                 int moneyInAcc = account1.GetMoney();
                 Console.WriteLine(moneyInAcc);
             }

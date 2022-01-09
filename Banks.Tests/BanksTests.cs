@@ -55,7 +55,7 @@ namespace Banks.Tests
             Account depositAccount2 = bank.OpenDepositAccount(client2, 100);
             Assert.Catch<BanksException>(() =>
             {
-                depositAccount.TransferMoneyToAnotherClient(depositAccount, depositAccount2, 10);
+                depositAccount.TransferMoneyToAnotherClient(depositAccount2, 10);
             });
         }
         [Test]
@@ -87,7 +87,7 @@ namespace Banks.Tests
             Client client1 = bank.CreateClient("Misha", "Makarov");
             bank.AddClient(client);
             Account debitAccount1 = bank.OpenDebitAccount(client1, 1000);
-            debitAccount.TransferMoneyToAnotherClient(debitAccount, debitAccount1, 2);
+            debitAccount.TransferMoneyToAnotherClient(debitAccount1, 2);
             Assert.AreEqual(1002, debitAccount1.GetMoney());
         }
         [Test]
