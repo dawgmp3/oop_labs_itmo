@@ -4,7 +4,7 @@ using Backups.Classes;
 
 namespace BackupsExtra.Services
 {
-    public class SecondCleaning : ICleaning
+    public class DateTimeCleaning : ICleaning
     {
         public List<RestorePoint> CleaningAlgorithm(List<RestorePoint> points, DateTime time, int limit)
         {

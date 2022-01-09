@@ -4,16 +4,26 @@ using Backups.Classes;
 
 namespace BackupsExtra.Services
 {
-    public class FirstCleaning : ICleaning
+    public class AmountOrDateTimeCleaning : ICleaning
     {
         public List<RestorePoint> CleaningAlgorithm(List<RestorePoint> points, DateTime time, int limit)
         {
-            RestorePoint point;
+            RestorePoint lastPoint;
             if (points.Count > limit)
             {
                 for (int i = 0; i < points.Count - limit; i++)
                 {
-                    point = points[points.Count - 1];
+                    lastPoint = points[points.Count - 1];
+                    points.Remove(lastPoint);
+                }
+
+                return points;
+            }
+
+            foreach (var point in points)
+            {
+                if (point.GetDateTime() < time)
+                {
                     points.Remove(point);
                 }
             }
