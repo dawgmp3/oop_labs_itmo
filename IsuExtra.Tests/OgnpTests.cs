@@ -54,7 +54,7 @@ namespace IsuExtra.Tests
             ExtraStudent student1 = new ExtraStudent("Misha1", new Guid(), group);
             Assert.Catch<IsuExtraException>(() =>
             {
-                _ognp.RemoveStudentFromOgnp1(student1, course);
+                _ognp.RemoveStudentFromOgnp(student1, course);
             });
         }
         [Test]
@@ -138,7 +138,7 @@ namespace IsuExtra.Tests
             List<ExtraStudent> students = course.Students;
             ExtraStudent student = new ExtraStudent("Misha", new Guid(), group);
             _ognp.AddStudentToCourse(student, course);
-            _ognp.RemoveStudentFromOgnp1(student, course);
+            _ognp.RemoveStudentFromOgnp(student, course);
             Assert.AreEqual(students, course.Students);
             }
     }

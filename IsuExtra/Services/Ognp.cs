@@ -108,7 +108,7 @@ namespace IsuExtra.Services
 
             foreach (var group in course.FlowOfCourse.Groups)
             {
-                if (group.CountOfStudents() < group.GetMaxAmount())
+                if (group.Students.Count < group.MaxCount)
                 {
                     groupForSigning = group;
                     if (HasScheduleIntersection(groupForSigning, student.GroupIsu.Schedule.GetSchedule(), student.GroupsOgnp)
@@ -143,9 +143,11 @@ namespace IsuExtra.Services
         {
             foreach (var course in _allCourses)
             {
-                foreach (var groupInFlow in course.FlowOfCourse.Groups.Where(groupInFlow => group.GetName() == groupInFlow.GetName()))
+                GroupOGNP groupOgnp =
+                    course.FlowOfCourse.Groups.FirstOrDefault(groupInFlow => groupInFlow.Name == group.Name);
+                if (groupOgnp != null)
                 {
-                    return groupInFlow.Students;
+                    return groupOgnp.Students;
                 }
             }
 
@@ -162,19 +164,18 @@ namespace IsuExtra.Services
             return _allStudent.Where(student => !_signedStudents.Contains(student)).ToList();
         }
 
-        public ExtraStudent RemoveStudentFromOgnp1(ExtraStudent student, Course course)
+        public ExtraStudent RemoveStudentFromOgnp(ExtraStudent student, Course course)
         {
             foreach (var group in course.FlowOfCourse.Groups)
             {
-                foreach (var studentInGroupOgnp in group.Students)
+                ExtraStudent studentInGroupOgnp =
+                    group.Students.FirstOrDefault(stud => student.GetStudentId() == stud.GetStudentId());
+                if (studentInGroupOgnp != null)
                 {
-                    if (student.GetStudentId() == studentInGroupOgnp.GetStudentId())
-                    {
-                        course.Students.Remove(student);
-                        group.Students.Remove(student);
-                        student.GroupsOgnp.Remove(group);
-                        return student;
-                    }
+                    course.Students.Remove(studentInGroupOgnp);
+                    group.Students.Remove(studentInGroupOgnp);
+                    studentInGroupOgnp.GroupsOgnp.Remove(group);
+                    return studentInGroupOgnp;
                 }
             }
 
