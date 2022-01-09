@@ -35,8 +35,9 @@ namespace Banks.Classes
 
         public List<Client> Clients { get; }
 
-        public void AddTransaction(Transaction transaction)
+        public void CreateTransaction(int money, Account catcherAccount, Account senderAccount)
         {
+            Transaction transaction = new Transaction(money, catcherAccount, senderAccount);
             _transactions.Add(transaction);
         }
 
@@ -190,6 +191,7 @@ namespace Banks.Classes
                 .WithPassport(passport)
                 .WithAccount();
             Client newClient = builder.Build();
+            newClient.BankClient = this;
             _doubtfulClients.Add(newClient);
             if (newClient.Name == null && newClient.Surname == null)
             {

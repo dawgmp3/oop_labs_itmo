@@ -62,8 +62,7 @@ namespace Banks.Classes
             if (_money >= money)
             {
                 _money = _money - money;
-                Transaction transaction = new Transaction(money, null, this);
-                _bank.AddTransaction(transaction);
+                _bank.CreateTransaction(money, null, this);
             }
             else
             {
@@ -76,7 +75,7 @@ namespace Banks.Classes
             return _bank;
         }
 
-        public virtual Transaction TransferMoneyToAnotherClient(Account accountCatcher, int moneyToSend)
+        public virtual void TransferMoneyToAnotherClient(Account accountCatcher, int moneyToSend)
         {
             if (!_client.CheckIsDoubtful())
             {
@@ -92,9 +91,7 @@ namespace Banks.Classes
                 accountCatcher.PutMoneyInAcc(moneyToSend);
             }
 
-            Transaction transaction = new Transaction(moneyToSend, accountCatcher, this);
-            _bank.AddTransaction(transaction);
-            return transaction;
+            _bank.CreateTransaction(moneyToSend, accountCatcher, this);
         }
 
         public void Update(Account account, int percentage)

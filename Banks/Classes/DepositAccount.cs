@@ -39,7 +39,7 @@ namespace Banks.Classes
             throw new BanksException("You can not withdraw money from deposit account");
         }
 
-        public override Transaction TransferMoneyToAnotherClient(Account clientCatcher, int moneyToSend)
+        public override void TransferMoneyToAnotherClient(Account clientCatcher, int moneyToSend)
         {
             throw new BanksException("You can not send money to another client from deposit account");
         }
