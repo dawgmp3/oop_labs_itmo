@@ -3,7 +3,7 @@ using Backups.Classes;
 
 namespace BackupsExtra.Services
 {
-    public class BackupExtra
+    public class BackupExtra : IBackupExtra
     {
         public void MergeFirst(RestorePoint oldPoint, RestorePoint newPoint)
         {
