@@ -59,10 +59,10 @@ namespace Isu.Services
         {
             if (_maxCountOfStudent < group.GetAmount())
                 throw new IsuException("There is no more place.");
-            StudentBuilder studentbuild = new StudentBuilder();
-            studentbuild.NameStudent(name);
-            studentbuild.GroupStudent(group);
-            studentbuild.IdStudent(Id());
+            Student.StudentBuilder studentbuild = new Student.StudentBuilder();
+            studentbuild.WithName(name);
+            studentbuild.WithGroup(group);
+            studentbuild.WithId(Id());
             Student student = studentbuild.Build();
             _allstudents.Add(student);
             group.PlusStudent();
@@ -119,12 +119,13 @@ namespace Isu.Services
 
         public Student ChangeStudentGroup(Student student, Group newGroup)
         {
-            Group oldgroup = student.GetStudentGroup();
-            oldgroup.MinusStudent();
-            student.SetGroup(newGroup);
-            Group newgroup = student.GetStudentGroup();
-            newgroup.PlusStudent();
-            return student;
+            var builder = new Student.StudentBuilder();
+            Student.StudentBuilder q = Student.ToBuild(builder);
+            q.WithName(student.GetStudentName());
+            q.WithGroup(newGroup);
+            q.WithId(student.GetStudentId());
+            Student changedStudent = q.Build();
+            return changedStudent;
         }
 
         private static Guid Id()

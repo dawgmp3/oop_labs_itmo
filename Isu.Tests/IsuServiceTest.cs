@@ -1,3 +1,4 @@
+using System;
 using Isu.Classes;
 using Isu.Services;
 using Isu.Tools;
@@ -21,7 +22,7 @@ namespace Isu.Tests
         public void AddStudentToGroup_StudentHasGroupAndGroupContainsStudent()
         {
             Group newgroup = _isuService.AddGroup("M3209");
-            Student newstudent = _isuService.AddStudent(newgroup,"Misha");
+            Student newstudent = _isuService.AddStudent(newgroup, "Misha");
             Assert.AreEqual(newstudent.GetStudentGroup(), newgroup);
         }
 
@@ -31,11 +32,10 @@ namespace Isu.Tests
             Group newgroup = _isuService.AddGroup("M3210");
             Assert.Catch<IsuException>(() =>
             {
-                for (var i = 0; i <= 31; i++)
+                for (var i = 0; i < 32; i++)
                 {
                     _isuService.AddStudent(newgroup, "Misha");
                 }
-                
             });
         }
 
