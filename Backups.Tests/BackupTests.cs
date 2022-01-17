@@ -8,14 +8,12 @@ namespace Backups.Tests
 {
     public class BackupTests
     {
-        private IBackupManager _backupManager;
         private BackupJob _backupJob;
 
         [SetUp]
         public void Setup()
         {
             _backupJob = new BackupJob();
-            _backupManager = new BackupManager(_backupJob);
         }
 
         [Test]
@@ -26,10 +24,10 @@ namespace Backups.Tests
             JobObject jobObject2 = new JobObject(new FileInfo(@"../../../Files/FileB"));
             List<JobObject> jobObjects = new List<JobObject>() {jobObject1, jobObject2};
             _backupJob.AddListJobObjects(jobObjects);
-            _backupManager.LaunchBackup(repository, new Split());
+            _backupJob.LaunchBackup(repository, new Split());
             _backupJob.DeleteJobObject(jobObject1);
-            _backupManager.LaunchBackup(repository, new Split());
-            Assert.AreEqual(2, _backupJob.GetRestorePoints().Count);
+            _backupJob.LaunchBackup(repository, new Split());
+            Assert.AreEqual(2, _backupJob.RestorePoints.Count);
             Assert.AreEqual(3, _backupJob.GetNumberOfStorages());
         }
     }
