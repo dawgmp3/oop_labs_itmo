@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Backups\Backups.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Directory1337" />
-  </ItemGroup>
-
 </Project>

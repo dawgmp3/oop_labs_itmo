@@ -8,16 +8,12 @@ namespace Backups.Classes
 {
     public class VirtualRepository : IRepository
     {
-        private DirectoryInfo _directory;
         public VirtualRepository(DirectoryInfo directory)
         {
-            _directory = directory;
+            Directory = directory;
         }
 
-        public DirectoryInfo GetDirectory()
-        {
-            return _directory;
-        }
+        public DirectoryInfo Directory { get; set; }
 
         public List<Storage> MakeBackup(List<JobObject> jobObjects, IAlgorithm algorithm)
         {
@@ -28,7 +24,7 @@ namespace Backups.Classes
             {
                 foreach (var jobObject in storage.JobObjects.ToList())
                 {
-                    newPath = $@"{_directory.FullName}/{jobObject.File.Name}{"_"}{i}.zip";
+                    newPath = $@"{Directory.FullName}/{jobObject.File.Name}{"_"}{i}.zip";
                     i++;
                     JobObject newJobObject = new JobObject(new FileInfo(newPath));
                     storage.JobObjects.Add(newJobObject);

@@ -45,7 +45,7 @@ namespace Backups.Classes
             int check = 0;
             foreach (var restorePoint in RestorePoints)
             {
-                check += restorePoint.GetStorages().Count;
+                check += restorePoint.Storages.Count;
             }
 
             return check;

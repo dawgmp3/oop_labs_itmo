@@ -1,3 +1,5 @@
+using System;
+using Isu.Classes;
 using Isu.Services;
 using Isu.Tools;
 using NUnit.Framework;
@@ -7,45 +9,54 @@ namespace Isu.Tests
     public class Tests
     {
         private IIsuService _isuService;
-
+        private int _maxAmountInGroup;
+        
         [SetUp]
         public void Setup()
         {
-            //TODO: implement
-            _isuService = null;
+            _maxAmountInGroup = 30;
+            _isuService = new IsuServices(_maxAmountInGroup);
         }
 
         [Test]
         public void AddStudentToGroup_StudentHasGroupAndGroupContainsStudent()
         {
-            Assert.Fail();
+            Group newgroup = _isuService.AddGroup("M3209");
+            Student newstudent = _isuService.AddStudent(newgroup, "Misha");
+            Assert.AreEqual(newstudent.GetStudentGroup(), newgroup);
         }
 
         [Test]
         public void ReachMaxStudentPerGroup_ThrowException()
         {
+            Group newgroup = _isuService.AddGroup("M3210");
             Assert.Catch<IsuException>(() =>
             {
-                
+                for (var i = 0; i < 32; i++)
+                {
+                    _isuService.AddStudent(newgroup, "Misha");
+                }
             });
         }
 
-        [Test]
-        public void CreateGroupWithInvalidName_ThrowException()
+        [TestCase("P3209")]
+        [TestCase("M3509")]    
+        public void CreateGroupWithInvalidName_ThrowException(string name)
         {
             Assert.Catch<IsuException>(() =>
             {
-
+                Group newgroup = _isuService.AddGroup(name);
             });
         }
 
         [Test]
         public void TransferStudentToAnotherGroup_GroupChanged()
         {
-            Assert.Catch<IsuException>(() =>
-            {
-
-            });
+            Group newgroup1 = _isuService.AddGroup("M3105");
+            Group newgroup2 = _isuService.AddGroup("M3106");
+            Student stud = _isuService.AddStudent(newgroup1, "Misha");
+            _isuService.ChangeStudentGroup(stud, newgroup2);
+            Assert.AreEqual(stud.GetStudentGroup().GetName().GrName, newgroup2.GetName().GrName);
         }
     }
 }

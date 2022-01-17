@@ -10,7 +10,7 @@ namespace Backups.Classes
         private List<Storage> _storage;
         public RestorePoint(List<Storage> storage)
         {
-            _storage = storage;
+            Storages = storage;
         }
 
         public void SetDateTime()
