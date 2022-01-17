@@ -13,7 +13,6 @@ namespace Backups
         private static void Main()
         {
             BackupJob backupJob = new BackupJob();
-
             IRepository repository = new LocalRepository(new DirectoryInfo(@"/Users/marinaburnaseva/Desktop/Directory11"));
             JobObject jobObject1 = new JobObject(new FileInfo(@"/Users/marinaburnaseva/Desktop/FileA"));
             JobObject jobObject2 = new JobObject(new FileInfo(@"/Users/marinaburnaseva/Desktop/FileB"));

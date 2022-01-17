@@ -12,7 +12,7 @@ namespace Backups.Classes
         }
 
         public Guid Id { get; }
-        public List<JobObject> JobObjects { get; }
+        public List<JobObject> JobObjects { get; set; }
 
         public List<JobObject> GetFiles()
         {
@@ -22,6 +22,11 @@ namespace Backups.Classes
         public void AddFile(JobObject jobObject)
         {
             JobObjects.Add(jobObject);
+        }
+
+        public List<JobObject> GetJobObjects()
+        {
+            return JobObjects;
         }
     }
 }
